@@ -1,5 +1,6 @@
 package com.panyukovnn.linkShortener;
 
+import com.panyukov.LoggingConfiguration;
 import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkShortener.model.LinkInfo;
 import com.panyukovnn.linkShortener.service.LinkInfoService;
@@ -25,6 +26,8 @@ public class Main {
         } else {
             System.out.println("The retrieved long link does not match the original link.");
         }
+
+        LoggingConfiguration.testLog("cvsdf");
 
     }
 

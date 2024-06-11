@@ -4,6 +4,7 @@ import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkShortener.model.LinkInfo;
 import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkShortener.repository.impl.LinkInfoRepositoryImpl;
+import exceptions.NotFoundException;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.Optional;
@@ -30,6 +31,6 @@ public class LinkInfoService {
 
     public String getByShortLink(String  shortLink) {
         Optional<LinkInfo> optionalLinkInfo = linkInfoRepository.findByShortLink(shortLink);
-        return optionalLinkInfo.map(LinkInfo::getLink).orElse(null);
+        return optionalLinkInfo.map(LinkInfo::getLink).orElseThrow(() -> new NotFoundException("Link not found"));
     }
 }
