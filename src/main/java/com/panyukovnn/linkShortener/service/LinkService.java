@@ -8,10 +8,11 @@ import java.util.Map;
 
 public class LinkService {
 
+    public static final int COUNT = 8;
     private final Map<String, CreateShortLinkRequest> linkStorage = new HashMap<>();
 
     public String generateShortLink(CreateShortLinkRequest createShortLinkRequest) {
-        String shortLink = RandomStringUtils.randomAlphanumeric(8);
+        String shortLink = RandomStringUtils.randomAlphanumeric(COUNT);
 
         linkStorage.put(shortLink, createShortLinkRequest);
 
