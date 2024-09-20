@@ -13,10 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
-
-    private final ConcurrentHashMap<String, LinkInfo> linkInfoMap =
-            new ConcurrentHashMap<>();
-
+    private final ConcurrentHashMap<String, LinkInfo> linkInfoMap = new ConcurrentHashMap<>();
 
     @Override
     public Optional<LinkInfo> findByShortLink(String shortLink) {
@@ -30,6 +27,4 @@ public class LinkInfoRepositoryImpl implements LinkInfoRepository {
         linkInfoMap.put(linkInfo.getShortLink(), linkInfo);
         return linkInfo;
     }
-
-
 }

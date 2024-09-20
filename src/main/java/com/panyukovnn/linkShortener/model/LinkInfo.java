@@ -37,16 +37,4 @@ public class LinkInfo {
         return Objects.hashCode(id);
     }
 
-    @Override
-    public String toString() {
-        return "LinkInfo{" +
-               "id=" + id +
-               ", shortLink='" + shortLink + '\'' +
-               ", link='" + link + '\'' +
-               ", openingCount=" + openingCount +
-               ", endTime=" + endTime +
-               ", description='" + description + '\'' +
-               ", active=" + active +
-               '}';
-    }
 }

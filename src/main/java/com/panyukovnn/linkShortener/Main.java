@@ -28,5 +28,9 @@ public class Main {
 
         System.out.println(shortLink);
         System.out.println(byShortLink.getLink());
+        LinkInfo errorShortLink = linkInfoService.getByShortLink("shortLink");
+
+        System.out.println(errorShortLink);
     }
 }
+

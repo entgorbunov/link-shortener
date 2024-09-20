@@ -1,6 +1,7 @@
 package com.panyukovnn.linkShortener.service;
 
 import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkShortener.exceptions.NotFoundException;
 import com.panyukovnn.linkShortener.model.LinkInfo;
 import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkShortener.repository.impl.LinkInfoRepositoryImpl;
@@ -37,7 +38,7 @@ public class LinkInfoService {
 
     public LinkInfo getByShortLink(String shortLink) {
         return repository.findByShortLink(shortLink)
-                .orElseThrow(() -> new NoSuchElementException("Короткая ссылка " + shortLink + " не найдена"));
+                .orElseThrow(() -> new NotFoundException("Короткая ссылка " + shortLink + " не найдена"));
     }
 
 

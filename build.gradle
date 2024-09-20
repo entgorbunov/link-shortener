@@ -9,6 +9,7 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 
@@ -20,6 +21,8 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.32'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
     implementation 'org.apache.commons:commons-lang3:3.0'
+
+    implementation 'com.panyukov:panyukov-gradle-starter:1.0-SNAPSHOT'
 
 }
 
