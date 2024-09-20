@@ -1,5 +1,6 @@
 package com.panyukovnn.linkShortener;
 
+import com.panyukov.LoggingConfiguration;
 import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkShortener.model.LinkInfo;
 import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
@@ -25,12 +26,14 @@ public class Main {
         String shortLink = gitHub.getShortLink();
         LinkInfo byShortLink = linkInfoService.getByShortLink(shortLink);
 
+        LoggingConfiguration.testLog("Testlog");
 
         System.out.println(shortLink);
         System.out.println(byShortLink.getLink());
         LinkInfo errorShortLink = linkInfoService.getByShortLink("shortLink");
 
         System.out.println(errorShortLink);
+
     }
 }
 
