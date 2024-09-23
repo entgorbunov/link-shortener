@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -13,7 +13,7 @@ import java.time.ZonedDateTime;
 @AllArgsConstructor
 public class CreateShortLinkRequest {
     private String link;
-    private ZonedDateTime endTime;
+    private LocalDateTime endTime;
     private String description;
     private Boolean active;
 
