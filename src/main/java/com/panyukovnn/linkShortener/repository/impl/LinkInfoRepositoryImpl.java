@@ -1,19 +1,18 @@
 package com.panyukovnn.linkShortener.repository.impl;
 
-import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkShortener.model.LinkInfo;
 import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
-import com.panyukovnn.linkShortener.util.Constants;
-import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.stereotype.Repository;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
+@Repository
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
-    private final ConcurrentHashMap<String, LinkInfo> linkInfoMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, LinkInfo> linkInfoMap = new ConcurrentHashMap<>();
 
     @Override
     public Optional<LinkInfo> findByShortLink(String shortLink) {
