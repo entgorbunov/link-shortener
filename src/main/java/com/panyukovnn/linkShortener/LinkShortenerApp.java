@@ -1,7 +1,6 @@
 package com.panyukovnn.linkShortener;
 
 import com.panyukovnn.linkShortener.service.LinkInfoService;
-import com.panyukovnn.linkShortener.service.LinkInfoServiceImpl;
 import com.panyukovnn.linkShortener.service.LogExecuionTimeLinkInfoServiceProxy;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
