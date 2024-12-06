@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.8'
+    id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.5'
 }
 
@@ -9,20 +9,22 @@ version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
-
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    compileOnly 'org.projectlombok:lombok:1.18.32'
-    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
-    testCompileOnly 'org.projectlombok:lombok:1.18.32'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
-    implementation 'org.apache.commons:commons-lang3:3.0'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
 
-    implementation 'com.panyukov:panyukov-gradle-starter:1.0-SNAPSHOT'
+    implementation 'org.apache.commons:commons-lang3'
 
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
+test {
+    useJUnitPlatform()
+}
