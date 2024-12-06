@@ -20,5 +20,9 @@ public class LinkService {
         return shortLink;
     }
 
+    public CreateShortLinkRequest getLink(String shortLink) {
+        return linkStorage.get(shortLink);
+    }
+
 
 }
