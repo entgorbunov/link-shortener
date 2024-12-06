@@ -13,7 +13,7 @@ public class LinkService {
     private final Map<String, CreateShortLinkRequest> linkStorage = new HashMap<>();
 
     public String generateShortLink(CreateShortLinkRequest createShortLinkRequest) {
-        String shortLink = RandomStringUtils.randomAlphanumeric(Constants.COUNT);
+        String shortLink = RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH);
 
         linkStorage.put(shortLink, createShortLinkRequest);
 
