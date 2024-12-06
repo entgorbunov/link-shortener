@@ -1,6 +1,10 @@
 package com.panyukovnn.linkShortener.service;
 
 import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkShortener.model.LinkInfoResponse;
+import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
+import com.panyukovnn.linkShortener.repository.impl.LinkInfoRepositoryImpl;
+import com.panyukovnn.linkShortener.service.impl.LinkInfoServiceImpl;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
@@ -18,8 +22,11 @@ public class LinkServiceTest {
                 .active(true)
                 .build();
 
-        LinkService service = new LinkService();
-        String shortLink = service.generateShortLink(request);
-        System.out.println(shortLink);
+        LinkInfoRepository repository = new LinkInfoRepositoryImpl();
+
+        LinkInfoService service = new LinkInfoServiceImpl(repository);
+
+        LinkInfoResponse linkInfo = service.createLinkInfo(request);
+        System.out.println(linkInfo.getShortLink());
     }
 }
