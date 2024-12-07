@@ -1,4 +1,4 @@
-package com.panyukovnn.linkShortener.exceptions;
+package com.panyukovnn.linkshortener.exceptions;
 
 public class LinkShortenerException extends RuntimeException {
 

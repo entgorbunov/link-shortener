@@ -1,15 +1,15 @@
-package com.panyukovnn.linkShortener;
+package com.panyukovnn.linkshortener;
 
-import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkShortener.model.LinkInfoResponse;
-import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
-import com.panyukovnn.linkShortener.repository.impl.LinkInfoRepositoryImpl;
-import com.panyukovnn.linkShortener.service.LinkInfoService;
-import com.panyukovnn.linkShortener.service.impl.LinkInfoServiceImpl;
+import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
+import com.panyukovnn.linkshortener.repository.impl.LinkInfoRepositoryImpl;
+import com.panyukovnn.linkshortener.service.LinkInfoService;
+import com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl;
 
 import java.time.LocalDateTime;
 
-public class Main {
+public class LinkShortenerApp {
     public static void main(String[] args) {
         LinkInfoRepository repository = new LinkInfoRepositoryImpl();
         LinkInfoService linkService = new LinkInfoServiceImpl(repository);

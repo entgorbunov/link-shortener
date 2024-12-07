@@ -1,4 +1,4 @@
-package com.panyukovnn.linkShortener.model;
+package com.panyukovnn.linkshortener.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,11 +17,11 @@ import java.util.UUID;
 @Builder
 public class LinkInfo {
 
+    private UUID id;
     private String link;
     private LocalDateTime endTime;
     private String description;
     private Boolean active;
-    private UUID id;
     private String shortLink;
     private Long openingCount;
 
