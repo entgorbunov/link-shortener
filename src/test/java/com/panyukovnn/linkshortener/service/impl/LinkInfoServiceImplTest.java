@@ -33,13 +33,13 @@ import static org.mockito.Mockito.when;
 public class LinkInfoServiceImplTest {
 
 	@Mock
-	private LinkInfoRepository repository;
+	private LinkInfoRepository linkInfoRepository;
 
 	private LinkInfoServiceImpl service;
 
 	@BeforeEach
 	void setUp() {
-		service = new LinkInfoServiceImpl(repository);
+		service = new LinkInfoServiceImpl(linkInfoRepository);
 	}
 
 	@Test
@@ -53,7 +53,7 @@ public class LinkInfoServiceImplTest {
 			.endTime(LocalDateTime.now().plusDays(1))
 			.openingCount(0L)
 			.build();
-		when(repository.findByShortLink(linkInfo.getShortLink())).thenReturn(linkInfo);
+		when(linkInfoRepository.findByShortLink(linkInfo.getShortLink())).thenReturn(linkInfo);
 
 
 		Optional<LinkInfoResponse> response = service.getByShortLink(linkInfo.getShortLink());
@@ -71,7 +71,7 @@ public class LinkInfoServiceImplTest {
 	@Test
 	void shouldThrowNotFoundExceptionWhenShortLinkDoesNotExist() {
 		String shortLink = "nonexistent";
-		when(repository.findByShortLink(shortLink)).thenReturn(null);
+		when(linkInfoRepository.findByShortLink(shortLink)).thenReturn(null);
 
 		assertThatThrownBy(() -> service.getByShortLink(shortLink))
 			.isInstanceOf(NotFoundException.class)
@@ -112,7 +112,7 @@ public class LinkInfoServiceImplTest {
 
 		List<LinkInfo> sourceList = List.of(linkInfo, linkInfo1, linkInfo2);
 
-		when(repository.findAll()).thenReturn(sourceList);
+		when(linkInfoRepository.findAll()).thenReturn(sourceList);
 
 		List<LinkInfoResponse> resultList = service.findByFilter();
 
@@ -130,13 +130,13 @@ public class LinkInfoServiceImplTest {
 
 		}
 
-		verify(repository, times(1)).findAll();
+		verify(linkInfoRepository, times(1)).findAll();
 
 	}
 
 	@Test
 	void shouldReturnEmptyListWhenNoLinksExist() {
-		when(repository.findAll()).thenReturn(new ArrayList<>());
+		when(linkInfoRepository.findAll()).thenReturn(new ArrayList<>());
 		List<LinkInfoResponse> emptyResult = service.findByFilter();
 
 		assertThat(emptyResult).isNotNull().hasSize(0);
@@ -153,7 +153,7 @@ public class LinkInfoServiceImplTest {
 			.endTime(LocalDateTime.now().plusDays(1))
 			.build();
 
-		when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
 		LinkInfoResponse response = service.createLinkInfo(request);
 
@@ -165,7 +165,7 @@ public class LinkInfoServiceImplTest {
 		assertNotNull(response.getId());
 
 
-		verify(repository, times(1)).save(any(LinkInfo.class));
+		verify(linkInfoRepository, times(1)).save(any(LinkInfo.class));
 
 	}
 
@@ -179,7 +179,7 @@ public class LinkInfoServiceImplTest {
 			.endTime(LocalDateTime.now().plusDays(1))
 			.build();
 
-		when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.<LinkInfo>getArgument(0));
+		when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.<LinkInfo>getArgument(0));
 
 		LinkInfoResponse response1 = service.createLinkInfo(request);
 		LinkInfoResponse response2 = service.createLinkInfo(request);
@@ -216,7 +216,7 @@ public class LinkInfoServiceImplTest {
 			.openingCount(0L)
 			.build();
 
-		when(repository.save(any(LinkInfo.class))).thenReturn(expectedSavedLink);
+		when(linkInfoRepository.save(any(LinkInfo.class))).thenReturn(expectedSavedLink);
 
 		LinkInfoResponse response = service.createLinkInfo(request);
 
@@ -231,7 +231,7 @@ public class LinkInfoServiceImplTest {
 		assertNotNull(response.getShortLink());
 
 
-		verify(repository, times(1)).save(any(LinkInfo.class));
+		verify(linkInfoRepository, times(1)).save(any(LinkInfo.class));
 
 	}
 
