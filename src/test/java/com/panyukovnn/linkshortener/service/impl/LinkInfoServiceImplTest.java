@@ -16,11 +16,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -29,206 +32,207 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class LinkInfoServiceImplTest {
 
-    @Mock
-    private LinkInfoRepository repository;
+	@Mock
+	private LinkInfoRepository repository;
 
-    private com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl service;
+	private LinkInfoServiceImpl service;
 
-    @BeforeEach
-    public void setUp() {
-        service = new com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl(repository);
-    }
+	@BeforeEach
+	void setUp() {
+		service = new LinkInfoServiceImpl(repository);
+	}
 
-    @Test
-    void shouldReturnLinkInfoWhenShortLinkExists() {
+	@Test
+	void shouldReturnLinkInfoWhenShortLinkExists() {
+		LinkInfo linkInfo = LinkInfo.builder()
+			.id(UUID.randomUUID())
+			.link("http://example.com")
+			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.active(true)
+			.description("Example link")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.openingCount(0L)
+			.build();
+		when(repository.findByShortLink(linkInfo.getShortLink())).thenReturn(linkInfo);
 
-        LinkInfo linkInfo = LinkInfo.builder()
-                                    .id(UUID.randomUUID())
-                                    .link("http://example.com")
-                                    .shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
-                                    .active(true)
-                                    .description("Example link")
-                                    .endTime(LocalDateTime.now().plusDays(1))
-                                    .openingCount(0L)
-                                    .build();
-        when(repository.findByShortLink(linkInfo.getShortLink())).thenReturn(linkInfo);
 
-        LinkInfoResponse response = service.getByShortLink(linkInfo.getShortLink());
+		Optional<LinkInfoResponse> response = service.getByShortLink(linkInfo.getShortLink());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getShortLink()).isEqualTo(linkInfo.getShortLink());
-        assertThat(response.getLink()).isEqualTo(linkInfo.getLink());
-        assertThat(response.getActive()).isEqualTo(linkInfo.getActive());
-        assertThat(response.getDescription()).isEqualTo(linkInfo.getDescription());
-        assertThat(response.getEndTime()).isEqualTo(linkInfo.getEndTime());
-        assertThat(response.getOpeningCount()).isEqualTo(linkInfo.getOpeningCount());
-    }
+		assertNotNull(response);
+		assertEquals(linkInfo.getShortLink(), response.orElseThrow(() -> new NotFoundException("ShortLink hasn't found")).getShortLink());
+		assertEquals(linkInfo.getLink(), response.orElseThrow(() -> new NotFoundException("Link hasn't found")).getLink());
+		assertEquals(linkInfo.getActive(), response.orElseThrow(() -> new NotFoundException("Status hasn't found")).getActive());
+		assertEquals(linkInfo.getDescription(), response.orElseThrow(() -> new NotFoundException("Description hasn't found")).getDescription());
+		assertEquals(linkInfo.getEndTime(), response.orElseThrow(() -> new NotFoundException("EndTime hasn't found")).getEndTime());
+		assertEquals(linkInfo.getOpeningCount(), response.orElseThrow(() -> new NotFoundException("OpeningCount hasn't found")).getOpeningCount());
 
-    @Test
-    void shouldThrowNotFoundExceptionWhenShortLinkDoesNotExist() {
+	}
 
-        String shortLink = "nonexistent";
-        when(repository.findByShortLink(shortLink)).thenReturn(null);
+	@Test
+	void shouldThrowNotFoundExceptionWhenShortLinkDoesNotExist() {
+		String shortLink = "nonexistent";
+		when(repository.findByShortLink(shortLink)).thenReturn(null);
 
-        assertThatThrownBy(() -> service.getByShortLink(shortLink))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("Link not found: " + shortLink);
-    }
+		assertThatThrownBy(() -> service.getByShortLink(shortLink))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessageContaining("Link not found: " + shortLink);
+	}
 
-    @Test
-    void shouldReturnAllExistingLinks() {
+	@Test
+	void shouldReturnAllExistingLinks() {
+		LinkInfo linkInfo = LinkInfo.builder()
+			.id(UUID.randomUUID())
+			.link("http://google.com")
+			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.active(true)
+			.description("Google link")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.openingCount(0L)
+			.build();
 
-        LinkInfo linkInfo = LinkInfo.builder()
-                                    .id(UUID.randomUUID())
-                                    .link("http://google.com")
-                                    .shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
-                                    .active(true)
-                                    .description("Google link")
-                                    .endTime(LocalDateTime.now().plusDays(1))
-                                    .openingCount(0L)
-                                    .build();
+		LinkInfo linkInfo1 = LinkInfo.builder()
+			.id(UUID.randomUUID())
+			.link("http://yandex.com")
+			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.active(true)
+			.description("Yandex link")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.openingCount(0L)
+			.build();
 
-        LinkInfo linkInfo1 = LinkInfo.builder()
-                                     .id(UUID.randomUUID())
-                                     .link("http://yandex.com")
-                                     .shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
-                                     .active(true)
-                                     .description("Yandex link")
-                                     .endTime(LocalDateTime.now().plusDays(1))
-                                     .openingCount(0L)
-                                     .build();
+		LinkInfo linkInfo2 = LinkInfo.builder()
+			.id(UUID.randomUUID())
+			.link("http://example.com")
+			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.active(true)
+			.description("Example link")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.openingCount(0L)
+			.build();
 
-        LinkInfo linkInfo2 = LinkInfo.builder()
-                                     .id(UUID.randomUUID())
-                                     .link("http://example.com")
-                                     .shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
-                                     .active(true)
-                                     .description("Example link")
-                                     .endTime(LocalDateTime.now().plusDays(1))
-                                     .openingCount(0L)
-                                     .build();
+		List<LinkInfo> sourceList = List.of(linkInfo, linkInfo1, linkInfo2);
 
-        List<LinkInfo> sourceList = List.of(linkInfo, linkInfo1, linkInfo2);
+		when(repository.findAll()).thenReturn(sourceList);
 
-        when(repository.findAll()).thenReturn(sourceList);
+		List<LinkInfoResponse> resultList = service.findByFilter();
 
-        List<LinkInfoResponse> resultList = service.findByFilter();
+		for (int i = 0; i < sourceList.size(); i++) {
+			LinkInfo source = sourceList.get(i);
+			LinkInfoResponse result = resultList.get(i);
 
-        for (int i = 0; i < sourceList.size(); i++) {
-            LinkInfo source = sourceList.get(i);
-            LinkInfoResponse result = resultList.get(i);
+			assertEquals(source.getId(), result.getId());
+			assertEquals(source.getLink(), result.getLink());
+			assertEquals(source.getShortLink(), result.getShortLink());
+			assertEquals(source.getActive(), result.getActive());
+			assertEquals(source.getEndTime(), result.getEndTime());
+			assertEquals(source.getOpeningCount(), result.getOpeningCount());
+			assertEquals(source.getDescription(), result.getDescription());
 
-            assertThat(result.getId()).isEqualTo(source.getId());
-            assertThat(result.getLink()).isEqualTo(source.getLink());
-            assertThat(result.getShortLink()).isEqualTo(source.getShortLink());
-            assertThat(result.getActive()).isEqualTo(source.getActive());
-            assertThat(result.getEndTime()).isEqualTo(source.getEndTime());
-            assertThat(result.getOpeningCount()).isEqualTo(source.getOpeningCount());
-            assertThat(result.getDescription()).isEqualTo(source.getDescription());
-        }
+		}
 
-        verify(repository, times(1)).findAll();
+		verify(repository, times(1)).findAll();
 
-    }
+	}
 
-    @Test
-    void shouldReturnEmptyListWhenNoLinksExist() {
+	@Test
+	void shouldReturnEmptyListWhenNoLinksExist() {
+		when(repository.findAll()).thenReturn(new ArrayList<>());
+		List<LinkInfoResponse> emptyResult = service.findByFilter();
 
-        when(repository.findAll()).thenReturn(new ArrayList<>());
-        List<LinkInfoResponse> emptyResult = service.findByFilter();
+		assertThat(emptyResult).isNotNull().hasSize(0);
 
-        assertThat(emptyResult).isNotNull().hasSize(0);
+	}
 
-    }
+	@Test
+	void shouldCreateLinkInfoWithCorrectFields() {
+		CreateShortLinkRequest request = CreateShortLinkRequest
+			.builder()
+			.link("Google.com")
+			.active(true)
+			.description("Google")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.build();
 
-    @Test
-    void shouldCreateLinkInfoWithCorrectFields() {
-        CreateShortLinkRequest request = CreateShortLinkRequest
-                .builder()
-                .link("Google.com")
-                .active(true)
-                .description("Google")
-                .endTime(LocalDateTime.now().plusDays(1))
-                .build();
+		when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		LinkInfoResponse response = service.createLinkInfo(request);
 
-        LinkInfoResponse response = service.createLinkInfo(request);
+		assertNotNull(response);
+		assertEquals(request.getLink(), response.getLink());
+		assertEquals(request.getDescription(), response.getDescription());
+		assertEquals(request.getActive(), response.getActive());
+		assertEquals(request.getEndTime(), response.getEndTime());
+		assertNotNull(response.getId());
 
-        assertThat(response).isNotNull();
-        assertThat(response.getLink()).isEqualTo(request.getLink());
-        assertThat(response.getDescription()).isEqualTo(request.getDescription());
-        assertThat(response.getActive()).isEqualTo(request.getActive());
-        assertThat(response.getEndTime()).isEqualTo(request.getEndTime());
-        assertThat(response.getId()).isNotNull();
 
-        verify(repository, times(1)).save(any(LinkInfo.class));
+		verify(repository, times(1)).save(any(LinkInfo.class));
 
-    }
+	}
 
-    @Test
-    void shouldGenerateUniqueShortLinksForSameRequest() {
+	@Test
+	void shouldCreateDifferentShortLinksForSameRequest() {
+		CreateShortLinkRequest request = CreateShortLinkRequest
+			.builder()
+			.link("Google.com")
+			.active(true)
+			.description("Google")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.build();
 
-        CreateShortLinkRequest request = CreateShortLinkRequest
-                .builder()
-                .link("Google.com")
-                .active(true)
-                .description("Google")
-                .endTime(LocalDateTime.now().plusDays(1))
-                .build();
+		when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.<LinkInfo>getArgument(0));
 
-        when(repository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.<LinkInfo>getArgument(0));
+		LinkInfoResponse response1 = service.createLinkInfo(request);
+		LinkInfoResponse response2 = service.createLinkInfo(request);
+		LinkInfoResponse response3 = service.createLinkInfo(request);
 
-        LinkInfoResponse response1 = service.createLinkInfo(request);
-        LinkInfoResponse response2 = service.createLinkInfo(request);
-        LinkInfoResponse response3 = service.createLinkInfo(request);
+		assertNotEquals(response1.getShortLink(), response2.getShortLink());
+		assertNotEquals(response2.getShortLink(), response3.getShortLink());
+		assertNotEquals(response1.getShortLink(), response3.getShortLink());
 
-        assertThat(response1.getShortLink().length()).isEqualTo(8);
-        assertThat(response2.getShortLink().length()).isEqualTo(8);
-        assertThat(response3.getShortLink().length()).isEqualTo(8);
+		assertEquals(request.getLink(), response1.getLink());
+		assertEquals(request.getDescription(), response1.getDescription());
+		assertEquals(request.getActive(), response1.getActive());
+		assertEquals(request.getEndTime(), response1.getEndTime());
 
-        Set<LinkInfoResponse> uniqueShortLinks = Set.of(response1, response2, response3);
+	}
 
-        assertThat(uniqueShortLinks).hasSize(3);
+	@Test
+	void shouldSaveLinkInfoAndReturnCorrectResponse() {
+		CreateShortLinkRequest request = CreateShortLinkRequest
+			.builder()
+			.link("Google.com")
+			.active(true)
+			.description("Google")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.build();
 
-    }
+		LinkInfo expectedSavedLink = LinkInfo.builder()
+			.link(request.getLink())
+			.active(request.getActive())
+			.description(request.getDescription())
+			.endTime(request.getEndTime())
+			.id(UUID.randomUUID())
+			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.openingCount(0L)
+			.build();
 
-    @Test
-    void shouldSaveLinkInfoAndReturnCorrectResponse() {
-        CreateShortLinkRequest request = CreateShortLinkRequest
-                .builder()
-                .link("Google.com")
-                .active(true)
-                .description("Google")
-                .endTime(LocalDateTime.now().plusDays(1))
-                .build();
+		when(repository.save(any(LinkInfo.class))).thenReturn(expectedSavedLink);
 
-        LinkInfo expectedSavedLink = LinkInfo.builder()
-                                             .link(request.getLink())
-                                             .active(request.getActive())
-                                             .description(request.getDescription())
-                                             .endTime(request.getEndTime())
-                                             .id(UUID.randomUUID())
-                                             .shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
-                                             .openingCount(0L)
-                                             .build();
+		LinkInfoResponse response = service.createLinkInfo(request);
 
-        when(repository.save(any(LinkInfo.class))).thenReturn(expectedSavedLink);
+		assertNotNull(response);
+		assertEquals(request.getLink(), response.getLink());
+		assertEquals(request.getDescription(), response.getDescription());
+		assertEquals(request.getActive(), response.getActive());
+		assertEquals(request.getEndTime(), response.getEndTime());
+		assertNotNull(response.getId());
+		assertEquals(8, response.getShortLink().length());
+		assertEquals(0L, response.getOpeningCount());
+		assertNotNull(response.getShortLink());
 
-        LinkInfoResponse response = service.createLinkInfo(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getLink()).isEqualTo(request.getLink());
-        assertThat(response.getDescription()).isEqualTo(request.getDescription());
-        assertThat(response.getActive()).isEqualTo(request.getActive());
-        assertThat(response.getEndTime()).isEqualTo(request.getEndTime());
-        assertThat(response.getId()).isNotNull();
-        assertThat(response.getShortLink()).hasSize(8);
-        assertThat(response.getOpeningCount()).isEqualTo(0L);
-        assertThat(response.getShortLink()).isNotNull();
+		verify(repository, times(1)).save(any(LinkInfo.class));
 
-        verify(repository, times(1)).save(any(LinkInfo.class));
-
-    }
+	}
 
 }

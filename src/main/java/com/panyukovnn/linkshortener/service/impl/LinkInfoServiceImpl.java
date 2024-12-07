@@ -10,17 +10,18 @@ import com.panyukovnn.linkshortener.util.Constants;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class LinkInfoServiceImpl implements LinkInfoService {
 
-	private final LinkInfoRepository repository;
+	private final LinkInfoRepository linkInfoRepository;
 
-	public LinkInfoServiceImpl(LinkInfoRepository repository) {
-		this.repository = repository;
+	public LinkInfoServiceImpl(LinkInfoRepository linkInfoRepository) {
+		this.linkInfoRepository = linkInfoRepository;
 	}
 
-	protected static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
+	private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
 		return LinkInfoResponse.builder()
 			.link(linkInfo.getLink())
 			.id(linkInfo.getId())
@@ -33,17 +34,17 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 	}
 
 	@Override
-	public LinkInfoResponse getByShortLink(String shortLink) {
-		LinkInfo byShortLink = repository.findByShortLink(shortLink);
-		if (byShortLink == null) {
+	public Optional<LinkInfoResponse> getByShortLink(String shortLink) {
+		LinkInfo linkInfo = linkInfoRepository.findByShortLink(shortLink);
+		if (linkInfo == null) {
 			throw new NotFoundException("Link not found: " + shortLink);
 		}
-		return convertToResponse(byShortLink);
+		return Optional.of(convertToResponse(linkInfo));
 	}
 
 	@Override
 	public List<LinkInfoResponse> findByFilter() {
-		return repository.findAll()
+		return linkInfoRepository.findAll()
 			.stream()
 			.map(LinkInfoServiceImpl::convertToResponse)
 			.toList();
@@ -61,7 +62,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 			.openingCount(0L)
 			.build();
 
-		LinkInfo savedLinkInfo = repository.save(linkInfo);
+		LinkInfo savedLinkInfo = linkInfoRepository.save(linkInfo);
 
 		return convertToResponse(savedLinkInfo);
 	}
