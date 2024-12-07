@@ -1,11 +1,11 @@
-package com.panyukovnn.linkShortener.service.impl;
+package com.panyukovnn.linkshortener.service.impl;
 
-import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkShortener.exceptions.NotFoundException;
-import com.panyukovnn.linkShortener.model.LinkInfo;
-import com.panyukovnn.linkShortener.model.LinkInfoResponse;
-import com.panyukovnn.linkShortener.repository.LinkInfoRepository;
-import com.panyukovnn.linkShortener.util.Constants;
+import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.exceptions.NotFoundException;
+import com.panyukovnn.linkshortener.model.LinkInfo;
+import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
+import com.panyukovnn.linkshortener.util.Constants;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,11 +32,11 @@ public class LinkInfoServiceImplTest {
     @Mock
     private LinkInfoRepository repository;
 
-    private LinkInfoServiceImpl service;
+    private com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl service;
 
     @BeforeEach
     public void setUp() {
-        service = new LinkInfoServiceImpl(repository);
+        service = new com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl(repository);
     }
 
     @Test

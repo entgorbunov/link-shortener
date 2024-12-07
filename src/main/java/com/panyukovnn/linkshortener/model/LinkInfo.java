@@ -1,4 +1,4 @@
-package com.panyukovnn.linkShortener.model;
+package com.panyukovnn.linkshortener.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

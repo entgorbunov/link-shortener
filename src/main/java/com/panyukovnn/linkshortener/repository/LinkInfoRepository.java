@@ -1,6 +1,6 @@
-package com.panyukovnn.linkShortener.repository;
+package com.panyukovnn.linkshortener.repository;
 
-import com.panyukovnn.linkShortener.model.LinkInfo;
+import com.panyukovnn.linkshortener.model.LinkInfo;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.panyukovnn.linkShortener.util;
+package com.panyukovnn.linkshortener.util;
 
 public class Constants {
 

@@ -1,7 +1,7 @@
-package com.panyukovnn.linkShortener.service;
+package com.panyukovnn.linkshortener.service;
 
-import com.panyukovnn.linkShortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkShortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.model.LinkInfoResponse;
 
 import java.util.List;
 
