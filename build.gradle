@@ -21,7 +21,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok'
 
     implementation 'org.apache.commons:commons-lang3'
-//    implementation 'com.panyukovn:logging-starter-maven:1.0-SNAPSHOT'
+    implementation 'com.panyukovn:logging-starter-gradle:1.0-SNAPSHOT'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.jupiter:junit-jupiter'

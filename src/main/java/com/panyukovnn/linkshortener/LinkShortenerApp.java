@@ -10,15 +10,15 @@ import com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl;
 import java.time.LocalDateTime;
 
 public class LinkShortenerApp {
-    public static void main(String[] args) {
-        LinkInfoRepository repository = new LinkInfoRepositoryImpl();
-        LinkInfoService linkService = new LinkInfoServiceImpl(repository);
-        LinkInfoResponse linkInfo = linkService.createLinkInfo(new CreateShortLinkRequest(
-                "https://github.com/entgorbunov/link-shortener",
-                LocalDateTime.now().plusDays(7),
-                "GitHub",
-                true
-        ));
-        System.out.println(linkInfo.getShortLink());
-    }
+	public static void main(String[] args) {
+		LinkInfoRepository repository = new LinkInfoRepositoryImpl();
+		LinkInfoService linkService = new LinkInfoServiceImpl(repository);
+		LinkInfoResponse linkInfo = linkService.createLinkInfo(new CreateShortLinkRequest(
+			"https://github.com/entgorbunov/link-shortener",
+			LocalDateTime.now().plusDays(7),
+			"GitHub",
+			true
+		));
+		System.out.println(linkInfo.getShortLink());
+	}
 }
