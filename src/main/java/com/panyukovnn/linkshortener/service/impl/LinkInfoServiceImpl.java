@@ -8,21 +8,18 @@ import com.panyukovnn.linkshortener.model.LinkInfoResponse;
 import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class LinkInfoServiceImpl implements LinkInfoService {
 
 	private final LinkInfoProperty linkInfoProperty;
 	private final LinkInfoRepository linkInfoRepository;
-
-	public LinkInfoServiceImpl(LinkInfoProperty linkInfoProperty, LinkInfoRepository linkInfoRepository) {
-		this.linkInfoProperty = linkInfoProperty;
-		this.linkInfoRepository = linkInfoRepository;
-	}
 
 	private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
 		return LinkInfoResponse.builder()
@@ -96,6 +93,4 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 	public void deleteById(UUID id) {
 		linkInfoRepository.deleteById(id);
 	}
-
-
 }

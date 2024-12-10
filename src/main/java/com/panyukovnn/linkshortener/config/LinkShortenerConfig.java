@@ -6,21 +6,16 @@ import com.panyukovnn.linkshortener.service.LinkInfoService;
 import com.panyukovnn.linkshortener.service.impl.LinkInfoServiceImpl;
 import com.panyukovnn.linkshortener.service.impl.LogExecutionTimeLinkInfoServiceProxy;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-@org.springframework.context.annotation.Configuration
-public class Configuration {
-
-	private final LinkInfoRepository linkInfoRepository;
-	private final LinkInfoProperty linkInfoProperty;
-
-	public Configuration(LinkInfoRepository linkInfoRepository, LinkInfoProperty linkInfoProperty) {
-		this.linkInfoRepository = linkInfoRepository;
-		this.linkInfoProperty = linkInfoProperty;
-	}
+@Configuration
+public class LinkShortenerConfig {
 
 	@Bean
-	public LinkInfoService linkInfoService() {
+	public LinkInfoService linkInfoService(LinkInfoRepository linkInfoRepository,
+										   LinkInfoProperty linkInfoProperty) {
 		LinkInfoServiceImpl linkInfoService = new LinkInfoServiceImpl(linkInfoProperty, linkInfoRepository);
 		return new LogExecutionTimeLinkInfoServiceProxy(linkInfoService);
 	}
+
 }
