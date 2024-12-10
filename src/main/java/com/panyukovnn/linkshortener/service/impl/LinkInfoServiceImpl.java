@@ -69,10 +69,8 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 
 	@Override
 	public LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request) {
-		LinkInfo linkInfo = linkInfoRepository.findByShortLink(request.getShortLink());
-		if (linkInfo == null) {
-			throw new NotFoundException("Ссылка не найдена, id:" + request.getId());
-		}
+		LinkInfo linkInfo = Optional.ofNullable(linkInfoRepository.findByShortLink(request.getShortLink()))
+			.orElseThrow(() -> new NotFoundException("Ссылка не найдена, id: " + request.getId()));
 		if (request.getDescription() != null) {
 			linkInfo.setDescription(request.getDescription());
 		}
