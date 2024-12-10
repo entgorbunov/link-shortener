@@ -69,9 +69,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 
 	@Override
 	public LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request) {
-		if (request.getId() == null) {
-			throw new IllegalArgumentException("ID должен присутствовать");
-		}
 		LinkInfo linkInfo = linkInfoRepository.findByShortLink(request.getShortLink());
 		if (linkInfo == null) {
 			throw new NotFoundException("Ссылка не найдена, id:" + request.getId());
@@ -81,9 +78,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 		}
 		if (request.getActive() != null) {
 			linkInfo.setActive(request.getActive());
-		}
-		if (request.getEndTime() != null) {
-			linkInfo.setEndTime(request.getEndTime());
 		}
 		LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
 		return convertToResponse(updatedLinkInfo);

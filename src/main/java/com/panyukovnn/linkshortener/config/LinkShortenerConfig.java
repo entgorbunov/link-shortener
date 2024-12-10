@@ -12,8 +12,7 @@ import org.springframework.context.annotation.Configuration;
 public class LinkShortenerConfig {
 
 	@Bean
-	public LinkInfoService linkInfoService(LinkInfoRepository linkInfoRepository,
-										   LinkInfoProperty linkInfoProperty) {
+	public LinkInfoService linkInfoService(LinkInfoRepository linkInfoRepository, LinkInfoProperty linkInfoProperty) {
 		LinkInfoServiceImpl linkInfoService = new LinkInfoServiceImpl(linkInfoProperty, linkInfoRepository);
 		return new LogExecutionTimeLinkInfoServiceProxy(linkInfoService);
 	}
