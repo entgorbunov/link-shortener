@@ -1,25 +1,25 @@
 package com.panyukovnn.linkshortener.service.impl;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
 import com.panyukovnn.linkshortener.model.LinkInfo;
 import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
-import com.panyukovnn.linkshortener.util.Constants;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 public class LinkInfoServiceImpl implements LinkInfoService {
 
+	private final LinkInfoProperty linkInfoProperty;
 	private final LinkInfoRepository linkInfoRepository;
-
-	public LinkInfoServiceImpl(LinkInfoRepository linkInfoRepository) {
-		this.linkInfoRepository = linkInfoRepository;
-	}
 
 	private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
 		return LinkInfoResponse.builder()
@@ -58,12 +58,31 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 			.endTime(request.getEndTime())
 			.description(request.getDescription())
 			.id(UUID.randomUUID())
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.openingCount(0L)
 			.build();
 
 		LinkInfo savedLinkInfo = linkInfoRepository.save(linkInfo);
 
 		return convertToResponse(savedLinkInfo);
+	}
+
+	@Override
+	public LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request) {
+		LinkInfo linkInfo = Optional.ofNullable(linkInfoRepository.findByShortLink(request.getShortLink()))
+			.orElseThrow(() -> new NotFoundException("Ссылка не найдена, id: " + request.getId()));
+		if (request.getDescription() != null) {
+			linkInfo.setDescription(request.getDescription());
+		}
+		if (request.getActive() != null) {
+			linkInfo.setActive(request.getActive());
+		}
+		LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
+		return convertToResponse(updatedLinkInfo);
+	}
+
+	@Override
+	public void deleteById(UUID id) {
+		linkInfoRepository.deleteById(id);
 	}
 }

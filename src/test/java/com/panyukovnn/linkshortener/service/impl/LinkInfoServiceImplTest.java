@@ -4,14 +4,16 @@ import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
 import com.panyukovnn.linkshortener.model.LinkInfo;
 import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
-import com.panyukovnn.linkshortener.util.Constants;
+import com.panyukovnn.linkshortener.service.LinkInfoService;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,30 +26,31 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
+@SpringBootTest
 public class LinkInfoServiceImplTest {
 
-	@Mock
+	@MockBean
 	private LinkInfoRepository linkInfoRepository;
 
-	private LinkInfoServiceImpl service;
+	@Autowired
+	private LinkInfoProperty linkInfoProperty;
 
-	@BeforeEach
-	void setUp() {
-		service = new LinkInfoServiceImpl(linkInfoRepository);
-	}
+	@Autowired
+	private LinkInfoService linkInfoService;
 
 	@Test
 	void shouldReturnLinkInfoWhenShortLinkExists() {
 		LinkInfo linkInfo = LinkInfo.builder()
 			.id(UUID.randomUUID())
 			.link("http://example.com")
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.active(true)
 			.description("Example link")
 			.endTime(LocalDateTime.now().plusDays(1))
@@ -56,7 +59,7 @@ public class LinkInfoServiceImplTest {
 		when(linkInfoRepository.findByShortLink(linkInfo.getShortLink())).thenReturn(linkInfo);
 
 
-		Optional<LinkInfoResponse> response = service.getByShortLink(linkInfo.getShortLink());
+		Optional<LinkInfoResponse> response = linkInfoService.getByShortLink(linkInfo.getShortLink());
 
 		assertNotNull(response);
 		assertEquals(linkInfo.getShortLink(), response.orElseThrow(() -> new NotFoundException("ShortLink hasn't found")).getShortLink());
@@ -73,7 +76,7 @@ public class LinkInfoServiceImplTest {
 		String shortLink = "nonexistent";
 		when(linkInfoRepository.findByShortLink(shortLink)).thenReturn(null);
 
-		assertThatThrownBy(() -> service.getByShortLink(shortLink))
+		assertThatThrownBy(() -> linkInfoService.getByShortLink(shortLink))
 			.isInstanceOf(NotFoundException.class)
 			.hasMessageContaining("Link not found: " + shortLink);
 	}
@@ -83,7 +86,7 @@ public class LinkInfoServiceImplTest {
 		LinkInfo linkInfo = LinkInfo.builder()
 			.id(UUID.randomUUID())
 			.link("http://google.com")
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.active(true)
 			.description("Google link")
 			.endTime(LocalDateTime.now().plusDays(1))
@@ -93,7 +96,7 @@ public class LinkInfoServiceImplTest {
 		LinkInfo linkInfo1 = LinkInfo.builder()
 			.id(UUID.randomUUID())
 			.link("http://yandex.com")
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.active(true)
 			.description("Yandex link")
 			.endTime(LocalDateTime.now().plusDays(1))
@@ -103,7 +106,7 @@ public class LinkInfoServiceImplTest {
 		LinkInfo linkInfo2 = LinkInfo.builder()
 			.id(UUID.randomUUID())
 			.link("http://example.com")
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.active(true)
 			.description("Example link")
 			.endTime(LocalDateTime.now().plusDays(1))
@@ -114,7 +117,7 @@ public class LinkInfoServiceImplTest {
 
 		when(linkInfoRepository.findAll()).thenReturn(sourceList);
 
-		List<LinkInfoResponse> resultList = service.findByFilter();
+		List<LinkInfoResponse> resultList = linkInfoService.findByFilter();
 
 		for (int i = 0; i < sourceList.size(); i++) {
 			LinkInfo source = sourceList.get(i);
@@ -137,7 +140,7 @@ public class LinkInfoServiceImplTest {
 	@Test
 	void shouldReturnEmptyListWhenNoLinksExist() {
 		when(linkInfoRepository.findAll()).thenReturn(new ArrayList<>());
-		List<LinkInfoResponse> emptyResult = service.findByFilter();
+		List<LinkInfoResponse> emptyResult = linkInfoService.findByFilter();
 
 		assertThat(emptyResult).isNotNull().hasSize(0);
 
@@ -155,7 +158,7 @@ public class LinkInfoServiceImplTest {
 
 		when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-		LinkInfoResponse response = service.createLinkInfo(request);
+		LinkInfoResponse response = linkInfoService.createLinkInfo(request);
 
 		assertNotNull(response);
 		assertEquals(request.getLink(), response.getLink());
@@ -181,9 +184,9 @@ public class LinkInfoServiceImplTest {
 
 		when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.<LinkInfo>getArgument(0));
 
-		LinkInfoResponse response1 = service.createLinkInfo(request);
-		LinkInfoResponse response2 = service.createLinkInfo(request);
-		LinkInfoResponse response3 = service.createLinkInfo(request);
+		LinkInfoResponse response1 = linkInfoService.createLinkInfo(request);
+		LinkInfoResponse response2 = linkInfoService.createLinkInfo(request);
+		LinkInfoResponse response3 = linkInfoService.createLinkInfo(request);
 
 		assertNotEquals(response1.getShortLink(), response2.getShortLink());
 		assertNotEquals(response2.getShortLink(), response3.getShortLink());
@@ -212,13 +215,13 @@ public class LinkInfoServiceImplTest {
 			.description(request.getDescription())
 			.endTime(request.getEndTime())
 			.id(UUID.randomUUID())
-			.shortLink(RandomStringUtils.randomAlphanumeric(Constants.SHORT_LINK_LENGTH))
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
 			.openingCount(0L)
 			.build();
 
 		when(linkInfoRepository.save(any(LinkInfo.class))).thenReturn(expectedSavedLink);
 
-		LinkInfoResponse response = service.createLinkInfo(request);
+		LinkInfoResponse response = linkInfoService.createLinkInfo(request);
 
 		assertNotNull(response);
 		assertEquals(request.getLink(), response.getLink());
@@ -233,6 +236,40 @@ public class LinkInfoServiceImplTest {
 
 		verify(linkInfoRepository, times(1)).save(any(LinkInfo.class));
 
+	}
+
+	@Test
+	void shouldShowMethodLogExecutionTime() {
+		CreateShortLinkRequest request = CreateShortLinkRequest
+			.builder()
+			.link("Google.com")
+			.active(true)
+			.description("Google")
+			.endTime(LocalDateTime.now().plusDays(1))
+			.build();
+
+		LinkInfo expectedLinkInfo = LinkInfo.builder()
+			.id(UUID.randomUUID())
+			.link(request.getLink())
+			.shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.getShortLinkLength()))
+			.active(request.getActive())
+			.description(request.getDescription())
+			.endTime(request.getEndTime())
+			.openingCount(0L)
+			.build();
+
+		when(linkInfoRepository.save(any(LinkInfo.class))).thenReturn(expectedLinkInfo);
+
+		when(linkInfoRepository.findByShortLink(expectedLinkInfo.getShortLink())).thenReturn(expectedLinkInfo);
+
+		LinkInfoResponse response = linkInfoService.createLinkInfo(request);
+
+		Optional<LinkInfoResponse> result = linkInfoService.getByShortLink(response.getShortLink());
+
+		assertTrue(result.isPresent());
+
+		verify(linkInfoRepository).save(any(LinkInfo.class));
+		verify(linkInfoRepository).findByShortLink(response.getShortLink());
 	}
 
 }
