@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateShortLinkRequest {
 
-	private String link;
-	private LocalDateTime endTime;
-	private String description;
-	private Boolean active;
+    private String link;
+    private LocalDateTime endTime;
+    private String description;
+    private Boolean active;
 
 }

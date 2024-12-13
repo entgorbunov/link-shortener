@@ -7,7 +7,7 @@ import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 public class LinkShortenerApp {
-	public static void main(String[] args) {
-		SpringApplication.run(LinkShortenerApp.class);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(LinkShortenerApp.class);
+    }
 }
