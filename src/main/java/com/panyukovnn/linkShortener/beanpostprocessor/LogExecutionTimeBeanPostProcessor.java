@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.stereotype.Component;
@@ -15,9 +16,14 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@ConditionalOnProperty(
+    prefix = "logging",
+    name = "enable-log-execution-time",
+    havingValue = "true"
+)
 public class LogExecutionTimeBeanPostProcessor implements BeanPostProcessor {
 
-    private static Logger log = LoggerFactory.getLogger(LogExecutionTimeBeanPostProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(LogExecutionTimeBeanPostProcessor.class);
 
     private final Map<String, BeanMethodsData> beanMethodsDataByBeanName = new HashMap<>();
 
