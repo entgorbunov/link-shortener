@@ -48,7 +48,8 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
-        LinkInfo linkInfo = linkInfoRepository.findByShortLink(shortLink).orElseThrow(() -> new NotFoundException("Ссылка не найдена"));
+        LinkInfo linkInfo = linkInfoRepository.findByShortLink(shortLink)
+            .orElseThrow(() -> new NotFoundException("Ссылка не найдена"));
         return convertToResponse(linkInfo);
     }
 
@@ -90,12 +91,10 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         if (request.getActive() != null) {
             linkInfo.setActive(request.getActive());
         }
-        if (request.getEndTime() != null) {
-            linkInfo.setEndTime(request.getEndTime());
-        }
         if (request.getLink() != null) {
             linkInfo.setLink(request.getLink());
         }
+        linkInfo.setEndTime(request.getEndTime());
         LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
         return convertToResponse(updatedLinkInfo);
     }
