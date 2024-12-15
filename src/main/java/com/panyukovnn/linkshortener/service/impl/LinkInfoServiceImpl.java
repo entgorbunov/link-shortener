@@ -33,18 +33,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     public LinkInfoServiceImpl() {
     }
 
-    private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
-        return LinkInfoResponse.builder()
-            .link(linkInfo.getLink())
-            .id(linkInfo.getId())
-            .active(linkInfo.getActive())
-            .description(linkInfo.getDescription())
-            .endTime(linkInfo.getEndTime())
-            .openingCount(linkInfo.getOpeningCount())
-            .shortLink(linkInfo.getShortLink())
-            .build();
-    }
-
     @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
@@ -103,5 +91,17 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     public void deleteById(UUID id) {
         linkInfoRepository.deleteById(id);
+    }
+
+    private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
+        return LinkInfoResponse.builder()
+            .link(linkInfo.getLink())
+            .id(linkInfo.getId())
+            .active(linkInfo.getActive())
+            .description(linkInfo.getDescription())
+            .endTime(linkInfo.getEndTime())
+            .openingCount(linkInfo.getOpeningCount())
+            .shortLink(linkInfo.getShortLink())
+            .build();
     }
 }
