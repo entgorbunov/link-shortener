@@ -9,53 +9,91 @@ import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
-
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Component
-@ConditionalLogExecution
 public class LogExecutionTimeBeanPostProcessor implements BeanPostProcessor {
 
-	private static final Logger log = LoggerFactory.getLogger(LogExecutionTimeBeanPostProcessor.class);
+    private static Logger log = LoggerFactory.getLogger(LogExecutionTimeBeanPostProcessor.class);
 
-	@Override
-	public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-		Set<Method> annotatedMethods = Arrays.stream(bean.getClass().getMethods())
-			.filter(method -> method.isAnnotationPresent(LogExecutionTime.class))
-			.collect(Collectors.toSet());
+    private final Map<String, BeanMethodsData> beanMethodsDataByBeanName = new HashMap<>();
 
-		if (annotatedMethods.isEmpty()) {
-			return bean;
-		}
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        Method[] methods = bean.getClass().getMethods();
 
-		MethodInterceptor methodInterceptor = (obj, method, args, proxy) -> {
-			boolean isAnnotated = annotatedMethods.stream()
-				.anyMatch(method::equals);
+        for (Method method : methods) {
+            boolean isAnnotated = method.isAnnotationPresent(LogExecutionTime.class);
 
-			if (isAnnotated) {
-				long start = System.currentTimeMillis();
-				try {
-					return method.invoke(bean, args);
-				} catch (Exception e) {
-					throw e.getCause();
-				} finally {
-					log.info("Время выполнения метода {}: {}", method.getName(), System.currentTimeMillis() - start);
-				}
-			}
+            if (isAnnotated) {
+                beanMethodsDataByBeanName.putIfAbsent(beanName, new BeanMethodsData(bean.getClass(), new ArrayList<>()));
+                beanMethodsDataByBeanName.get(beanName).annotatedMethods().add(method);
+            }
+        }
 
-			try {
-				return method.invoke(bean, args);
-			} catch (Exception e) {
-				throw e.getCause();
-			}
-		};
+        return BeanPostProcessor.super.postProcessBeforeInitialization(bean, beanName);
+    }
 
-		Enhancer enhancer = new Enhancer();
-		enhancer.setSuperclass(bean.getClass());
-		enhancer.setCallback(methodInterceptor);
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        BeanMethodsData beanMethodsData = beanMethodsDataByBeanName.get(beanName);
 
-		return enhancer.create();
-	}
+        if (beanMethodsData == null) {
+            return BeanPostProcessor.super.postProcessAfterInitialization(bean, beanName);
+        }
+
+        Class<?> beanClass = beanMethodsData.clazz();
+        List<Method> annotatedMethods = beanMethodsData.annotatedMethods();
+
+        MethodInterceptor methodInterceptor = (obj, method, args, proxy) -> {
+            boolean isAnnotated = annotatedMethods.stream().anyMatch(pojoMethod -> methodEquals(pojoMethod, method));
+
+            if (isAnnotated) {
+                long start = System.currentTimeMillis();
+                try {
+                    return method.invoke(bean, args);
+                } catch (Exception e) {
+                    throw e.getCause();
+                } finally {
+                    log.info("Время выполнения метода {}: {}", method.getName(), System.currentTimeMillis() - start);
+                }
+            }
+
+            try {
+                return method.invoke(bean, args);
+            } catch (Exception e) {
+                throw e.getCause();
+            }
+        };
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(beanClass);
+        enhancer.setCallback(methodInterceptor);
+
+        return enhancer.create();
+    }
+
+    public boolean methodEquals(Method method1, Method method2) {
+        if (method1.getName().equals(method2.getName())) {
+            return equalParamTypes(method1.getParameterTypes(), method2.getParameterTypes());
+        }
+        return false;
+    }
+
+    private boolean equalParamTypes(Class<?>[] params1, Class<?>[] params2) {
+        if (params1.length == params2.length) {
+            for (int i = 0; i < params1.length; i++) {
+                if (params1[i] != params2[i])
+                    return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private record BeanMethodsData(Class<?> clazz, List<Method> annotatedMethods) {
+    }
 }
