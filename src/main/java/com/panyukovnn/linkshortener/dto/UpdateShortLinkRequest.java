@@ -17,7 +17,7 @@ import java.util.UUID;
 public class UpdateShortLinkRequest {
 
 	private UUID id;
-	private String shortLink;
+	private String link;
 	private LocalDateTime endTime;
 	private String description;
 	private Boolean active;
