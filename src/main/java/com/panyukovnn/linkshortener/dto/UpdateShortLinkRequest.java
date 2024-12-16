@@ -7,17 +7,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateShortLinkRequest {
+public class UpdateShortLinkRequest {
 
-	private String link;
+	private UUID id;
+	private String shortLink;
 	private LocalDateTime endTime;
 	private String description;
 	private Boolean active;
-
 }
