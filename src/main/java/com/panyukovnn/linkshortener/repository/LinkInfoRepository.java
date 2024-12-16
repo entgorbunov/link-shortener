@@ -1,21 +1,18 @@
-package com.panyukovnn.linkshortener.service;
+package com.panyukovnn.linkshortener.repository;
 
-import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
-import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.model.LinkInfo;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-public interface LinkInfoService {
+public interface LinkInfoRepository {
 
-    LinkInfoResponse getByShortLink(String shortLink);
+    Optional<LinkInfo> findByShortLink(String shortLink);
 
-    List<LinkInfoResponse> findByFilter();
+    LinkInfo save(LinkInfo linkInfo);
 
-    LinkInfoResponse createLinkInfo(CreateShortLinkRequest request);
-
-    LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request);
+    List<LinkInfo> findAll();
 
     void deleteById(UUID id);
 }
