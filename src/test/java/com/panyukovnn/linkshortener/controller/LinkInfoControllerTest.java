@@ -64,43 +64,8 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.createShortLink(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         assertThat(response.getData()).isEqualTo(expectedResponse);
         verify(linkInfoService, times(1)).createLinkInfo(createRequest);
-    }
-
-    @Test
-    void shouldUpdateShortLinkSuccessfully() {
-        UpdateShortLinkRequest updateRequest = UpdateShortLinkRequest.builder()
-            .id(UUID.randomUUID())
-            .link("abc123")
-            .description("Updated description")
-            .active(false)
-            .endTime(LocalDateTime.now().plusDays(1))
-            .build();
-
-        CommonRequest<UpdateShortLinkRequest> request = new CommonRequest<>();
-        request.setData(updateRequest);
-
-        LinkInfoResponse expectedResponse = LinkInfoResponse.builder()
-            .id(updateRequest.getId())
-            .link(updateRequest.getLink())
-            .shortLink("abc123")
-            .description(updateRequest.getDescription())
-            .active(updateRequest.getActive())
-            .endTime(updateRequest.getEndTime())
-            .openingCount(5L)
-            .build();
-
-        when(linkInfoService.updateLinkInfo(any(UpdateShortLinkRequest.class)))
-            .thenReturn(expectedResponse);
-
-        CommonResponse<LinkInfoResponse> response = linkInfoController.updateShortLink(request);
-
-        assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
-        assertThat(response.getData()).isEqualTo(expectedResponse);
-        verify(linkInfoService, times(1)).updateLinkInfo(updateRequest);
     }
 
     @Test
@@ -122,7 +87,6 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         assertThat(response.getData()).isEqualTo(expectedResponse);
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
@@ -156,7 +120,6 @@ class LinkInfoControllerTest {
         CommonResponse<List<LinkInfoResponse>> response = linkInfoController.getAllLinks();
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         assertThat(response.getData()).isEqualTo(expectedLinks);
         assertThat(response.getData()).hasSize(2);
         verify(linkInfoService, times(1)).findByFilter();
@@ -170,7 +133,6 @@ class LinkInfoControllerTest {
         CommonResponse<Void> response = linkInfoController.deleteLink(id);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         verify(linkInfoService, times(1)).deleteById(id);
     }
 
@@ -193,8 +155,7 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isFalse();
-        assertThat(response.getError()).isEqualTo("Ссылка неактивна");
+        assertThat(response.getErrorMessage()).isEqualTo("Ссылка неактивна");
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 
@@ -217,8 +178,7 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isFalse();
-        assertThat(response.getError()).isEqualTo("Ссылка недействительна");
+        assertThat(response.getErrorMessage()).isEqualTo("Ссылка недействительна");
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 
@@ -241,9 +201,8 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         assertThat(response.getData()).isEqualTo(validLinkInfo);
-        assertThat(response.getError()).isNull();
+        assertThat(response.getErrorMessage()).isNull();
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 
@@ -266,9 +225,8 @@ class LinkInfoControllerTest {
         CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
 
         assertThat(response).isNotNull();
-        assertThat(response.isSuccess()).isTrue();
         assertThat(response.getData()).isEqualTo(linkWithNoEndTime);
-        assertThat(response.getError()).isNull();
+        assertThat(response.getErrorMessage()).isNull();
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 

@@ -1,7 +1,6 @@
 package com.panyukovnn.linkshortener.controller;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.model.CommonRequest;
 import com.panyukovnn.linkshortener.model.CommonResponse;
 import com.panyukovnn.linkshortener.model.LinkInfoResponse;
@@ -11,7 +10,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,17 +31,7 @@ public class LinkInfoController {
 
         return CommonResponse.<LinkInfoResponse>builder()
             .data(linkInfo)
-            .success(true)
-            .build();
-    }
-
-    @PutMapping("/update")
-    public CommonResponse<LinkInfoResponse> updateShortLink(@RequestBody CommonRequest<UpdateShortLinkRequest> request) {
-        LinkInfoResponse linkInfo = linkInfoService.updateLinkInfo(request.getData());
-
-        return CommonResponse.<LinkInfoResponse>builder()
-            .data(linkInfo)
-            .success(true)
+            .uuid(UUID.randomUUID())
             .build();
     }
 
@@ -53,24 +41,23 @@ public class LinkInfoController {
 
         if (!linkInfo.getActive()) {
             return CommonResponse.<LinkInfoResponse>builder()
-                .success(false)
-                .error("Ссылка неактивна")
+                .errorMessage("Ссылка неактивна")
+                .uuid(UUID.randomUUID())
                 .build();
         }
 
         if (linkInfo.getEndTime() != null && LocalDateTime.now().isAfter(linkInfo.getEndTime())) {
             return CommonResponse.<LinkInfoResponse>builder()
-                .success(false)
-                .error("Ссылка недействительна")
+                .errorMessage("Ссылка недействительна")
+                .uuid(UUID.randomUUID())
                 .build();
         }
 
         return CommonResponse.<LinkInfoResponse>builder()
             .data(linkInfo)
-            .success(true)
+            .uuid(UUID.randomUUID())
             .build();
     }
-
 
     @GetMapping
     public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
@@ -78,7 +65,7 @@ public class LinkInfoController {
 
         return CommonResponse.<List<LinkInfoResponse>>builder()
             .data(links)
-            .success(true)
+            .uuid(UUID.randomUUID())
             .build();
     }
 
@@ -87,7 +74,7 @@ public class LinkInfoController {
         linkInfoService.deleteById(id);
 
         return CommonResponse.<Void>builder()
-            .success(true)
+            .uuid(UUID.randomUUID())
             .build();
     }
 }
