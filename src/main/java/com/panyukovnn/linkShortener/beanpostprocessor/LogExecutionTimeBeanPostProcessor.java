@@ -7,6 +7,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Profile("log-exec-time")
 @ConditionalOnProperty(
     prefix = "logging",
     name = "enable-log-execution-time",
