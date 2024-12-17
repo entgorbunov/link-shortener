@@ -10,5 +10,5 @@ import java.util.UUID;
 public class CommonResponse<T> {
     private T data;
     private String errorMessage;
-    private UUID uuid;
+    private UUID id;
 }
