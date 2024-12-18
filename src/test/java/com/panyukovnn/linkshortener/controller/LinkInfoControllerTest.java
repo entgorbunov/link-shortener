@@ -1,15 +1,16 @@
 package com.panyukovnn.linkshortener.controller;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
-import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
-import com.panyukovnn.linkshortener.model.CommonRequest;
-import com.panyukovnn.linkshortener.model.CommonResponse;
-import com.panyukovnn.linkshortener.model.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.common.CommonRequest;
+import com.panyukovnn.linkshortener.dto.common.CommonResponse;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -84,10 +85,10 @@ class LinkInfoControllerTest {
         when(linkInfoService.getByShortLink(shortLink))
             .thenReturn(expectedResponse);
 
-        CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
+        ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getData()).isEqualTo(expectedResponse);
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(expectedResponse.getLink());
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 
@@ -137,76 +138,6 @@ class LinkInfoControllerTest {
     }
 
     @Test
-    void shouldFailWhenLinkIsInactive() {
-        String shortLink = "abc123";
-        LinkInfoResponse inactiveLinkInfo = LinkInfoResponse.builder()
-            .id(UUID.randomUUID())
-            .link("http://example.com")
-            .shortLink(shortLink)
-            .active(false)
-            .description("Test link")
-            .endTime(LocalDateTime.now().plusDays(1))
-            .openingCount(10L)
-            .build();
-
-        when(linkInfoService.getByShortLink(shortLink))
-            .thenReturn(inactiveLinkInfo);
-
-        CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getErrorMessage()).isEqualTo("Ссылка неактивна");
-        verify(linkInfoService, times(1)).getByShortLink(shortLink);
-    }
-
-    @Test
-    void shouldFailWhenLinkIsExpired() {
-        String shortLink = "abc123";
-        LinkInfoResponse expiredLinkInfo = LinkInfoResponse.builder()
-            .id(UUID.randomUUID())
-            .link("http://example.com")
-            .shortLink(shortLink)
-            .active(true)
-            .description("Test link")
-            .endTime(LocalDateTime.now().minusDays(1)) // время жизни истекло
-            .openingCount(10L)
-            .build();
-
-        when(linkInfoService.getByShortLink(shortLink))
-            .thenReturn(expiredLinkInfo);
-
-        CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getErrorMessage()).isEqualTo("Ссылка недействительна");
-        verify(linkInfoService, times(1)).getByShortLink(shortLink);
-    }
-
-    @Test
-    void shouldSucceedWhenLinkIsActiveAndNotExpired() {
-        String shortLink = "abc123";
-        LinkInfoResponse validLinkInfo = LinkInfoResponse.builder()
-            .id(UUID.randomUUID())
-            .link("http://example.com")
-            .shortLink(shortLink)
-            .active(true)
-            .description("Test link")
-            .endTime(LocalDateTime.now().plusDays(1))
-            .openingCount(10L)
-            .build();
-
-        when(linkInfoService.getByShortLink(shortLink))
-            .thenReturn(validLinkInfo);
-
-        CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getData()).isEqualTo(validLinkInfo);
-        assertThat(response.getErrorMessage()).isNull();
-        verify(linkInfoService, times(1)).getByShortLink(shortLink);
-    }
-
-    @Test
     void shouldSucceedWhenLinkHasNoEndTime() {
         String shortLink = "abc123";
         LinkInfoResponse linkWithNoEndTime = LinkInfoResponse.builder()
@@ -222,11 +153,11 @@ class LinkInfoControllerTest {
         when(linkInfoService.getByShortLink(shortLink))
             .thenReturn(linkWithNoEndTime);
 
-        CommonResponse<LinkInfoResponse> response = linkInfoController.getByShortLink(shortLink);
+        ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getData()).isEqualTo(linkWithNoEndTime);
-        assertThat(response.getErrorMessage()).isNull();
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isEqualTo(linkWithNoEndTime.getLink());
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 

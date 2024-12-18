@@ -1,5 +1,9 @@
 package com.panyukovnn.linkshortener.dto;
 
+import com.panyukovnn.linkshortener.validation.ValidFutureDateTime;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,9 +19,14 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateShortLinkRequest {
 
-	private String link;
-	private LocalDateTime endTime;
-	private String description;
-	private Boolean active;
+    @NotEmpty(message = "Ссылка не может быть пустой")
+    @Pattern(regexp = "^http[s]?://.+\\..+", message = "В ссылке допущена ошибка")
+    private String link;
+    @ValidFutureDateTime
+    private LocalDateTime endTime;
+    @NotEmpty(message = "Описание не должно быть пустым")
+    private String description;
+    @NotNull(message = "Признак активности не может быть null")
+    private Boolean active;
 
 }
