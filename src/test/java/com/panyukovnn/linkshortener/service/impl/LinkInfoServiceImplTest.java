@@ -1,10 +1,10 @@
 package com.panyukovnn.linkshortener.service.impl;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
 import com.panyukovnn.linkshortener.model.LinkInfo;
-import com.panyukovnn.linkshortener.model.LinkInfoResponse;
 import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
