@@ -27,7 +27,7 @@ public class LinkControllerValidationTest {
     private ObjectMapper objectMapper;
 
     @Test
-    void shouldFailWhenCreateRequestHasEmptyLink() throws Exception {
+    void shouldFailWhenCreatedRequestHasEmptyLink() throws Exception {
         CreateShortLinkRequest createRequest = CreateShortLinkRequest.builder()
             .link("")
             .active(true)
@@ -44,7 +44,7 @@ public class LinkControllerValidationTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage").value("Ошибка валидации"))
             .andExpect(jsonPath("$.validationErrors[0].field").value("data.link"))
-            .andExpect(jsonPath("$.validationErrors[0].message").value("Ссылка не может быть пустой"));
+            .andExpect(jsonPath("$.validationErrors[0].message").value("В ссылке допущена ошибка"));
     }
 
     @Test

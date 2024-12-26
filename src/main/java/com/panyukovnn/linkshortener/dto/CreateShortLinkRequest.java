@@ -19,7 +19,6 @@ import java.time.LocalDateTime;
 @Builder
 public class CreateShortLinkRequest {
 
-    @NotEmpty(message = "Ссылка не может быть пустой")
     @Pattern(regexp = "^http[s]?://.+\\..+", message = "В ссылке допущена ошибка")
     private String link;
     @ValidFutureDateTime

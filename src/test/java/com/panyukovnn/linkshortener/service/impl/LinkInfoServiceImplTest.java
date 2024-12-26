@@ -159,7 +159,17 @@ public class LinkInfoServiceImplTest {
             .endTime(LocalDateTime.now().plusDays(1))
             .build();
 
-        when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        LinkInfo savedLinkInfo = LinkInfo.builder()
+            .id(UUID.randomUUID())
+            .link(request.getLink())
+            .shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.shortLinkLength()))
+            .active(request.getActive())
+            .description(request.getDescription())
+            .endTime(request.getEndTime())
+            .openingCount(0L)
+            .build();
+
+        when(linkInfoRepository.save(any(LinkInfo.class))).thenReturn(savedLinkInfo);
 
         LinkInfoResponse response = linkInfoService.createLinkInfo(request);
 
