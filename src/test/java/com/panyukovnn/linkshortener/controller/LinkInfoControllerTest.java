@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
@@ -47,7 +49,7 @@ class LinkInfoControllerTest {
             .build();
 
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
-        request.setData(createRequest);
+        request.setBody(createRequest);
 
         LinkInfoResponse expectedResponse = LinkInfoResponse.builder()
             .id(UUID.randomUUID())
@@ -64,8 +66,13 @@ class LinkInfoControllerTest {
 
         CommonResponse<LinkInfoResponse> response = linkInfoController.createShortLink(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.getData()).isEqualTo(expectedResponse);
+        assertNotNull(response, "Ответ не должен быть null");
+
+        assertAll(
+            () -> assertThat(response).isNotNull(),
+            () -> assertThat(response.getBody()).isEqualTo(expectedResponse)
+            );
+
         verify(linkInfoService, times(1)).createLinkInfo(createRequest);
     }
 
@@ -87,8 +94,11 @@ class LinkInfoControllerTest {
 
         ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(expectedResponse.getLink());
+        assertAll(
+            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+            () -> assertThat(response.getBody()).isEqualTo(expectedResponse.getLink())
+        );
+
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 
@@ -120,9 +130,12 @@ class LinkInfoControllerTest {
 
         CommonResponse<List<LinkInfoResponse>> response = linkInfoController.getAllLinks();
 
-        assertThat(response).isNotNull();
-        assertThat(response.getData()).isEqualTo(expectedLinks);
-        assertThat(response.getData()).hasSize(2);
+        assertNotNull(response, "Ответ не должен быть null");
+        assertAll(
+            () -> assertThat(response).isNotNull(),
+            () -> assertThat(response.getBody()).isEqualTo(expectedLinks),
+            () -> assertThat(response.getBody()).hasSize(2)
+        );
         verify(linkInfoService, times(1)).findByFilter();
     }
 
@@ -133,8 +146,10 @@ class LinkInfoControllerTest {
 
         CommonResponse<Void> response = linkInfoController.deleteLink(id);
 
-        assertThat(response).isNotNull();
-        verify(linkInfoService, times(1)).deleteById(id);
+        assertAll(
+            () -> assertThat(response).isNotNull(),
+            () -> verify(linkInfoService, times(1)).deleteById(id)
+        );
     }
 
     @Test
@@ -155,9 +170,10 @@ class LinkInfoControllerTest {
 
         ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
 
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isEqualTo(linkWithNoEndTime.getLink());
+        assertAll(
+            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
+            () -> assertThat(response.getBody()).isEqualTo(linkWithNoEndTime.getLink())
+        );
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }
 

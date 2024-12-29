@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -64,14 +65,15 @@ public class LinkInfoServiceImplTest {
 
         Optional<LinkInfoResponse> response = Optional.ofNullable(linkInfoService.getByShortLink(linkInfo.getShortLink()));
 
-        assertNotNull(response);
-        assertEquals(linkInfo.getShortLink(), response.orElseThrow(() -> new NotFoundException("ShortLink hasn't found")).getShortLink());
-        assertEquals(linkInfo.getLink(), response.orElseThrow(() -> new NotFoundException("Link hasn't found")).getLink());
-        assertEquals(linkInfo.getActive(), response.orElseThrow(() -> new NotFoundException("Status hasn't found")).getActive());
-        assertEquals(linkInfo.getDescription(), response.orElseThrow(() -> new NotFoundException("Description hasn't found")).getDescription());
-        assertEquals(linkInfo.getEndTime(), response.orElseThrow(() -> new NotFoundException("EndTime hasn't found")).getEndTime());
-        assertEquals(linkInfo.getOpeningCount(), response.orElseThrow(() -> new NotFoundException("OpeningCount hasn't found")).getOpeningCount());
-
+        assertAll(
+            () -> assertNotNull(response),
+            () -> assertEquals(linkInfo.getShortLink(), response.orElseThrow(() -> new NotFoundException("ShortLink hasn't found")).getShortLink()),
+            () -> assertEquals(linkInfo.getLink(), response.orElseThrow(() -> new NotFoundException("Link hasn't found")).getLink()),
+            () -> assertEquals(linkInfo.getActive(), response.orElseThrow(() -> new NotFoundException("Status hasn't found")).getActive()),
+            () -> assertEquals(linkInfo.getDescription(), response.orElseThrow(() -> new NotFoundException("Description hasn't found")).getDescription()),
+            () -> assertEquals(linkInfo.getEndTime(), response.orElseThrow(() -> new NotFoundException("EndTime hasn't found")).getEndTime()),
+            () -> assertEquals(linkInfo.getOpeningCount(), response.orElseThrow(() -> new NotFoundException("OpeningCount hasn't found")).getOpeningCount())
+        );
     }
 
     @Test
@@ -126,13 +128,16 @@ public class LinkInfoServiceImplTest {
             LinkInfo source = sourceList.get(i);
             LinkInfoResponse result = resultList.get(i);
 
-            assertEquals(source.getId(), result.getId());
-            assertEquals(source.getLink(), result.getLink());
-            assertEquals(source.getShortLink(), result.getShortLink());
-            assertEquals(source.getActive(), result.getActive());
-            assertEquals(source.getEndTime(), result.getEndTime());
-            assertEquals(source.getOpeningCount(), result.getOpeningCount());
-            assertEquals(source.getDescription(), result.getDescription());
+            assertAll(
+                () -> assertEquals(source.getId(), result.getId()),
+                () -> assertEquals(source.getLink(), result.getLink()),
+                () -> assertEquals(source.getShortLink(), result.getShortLink()),
+                () -> assertEquals(source.getActive(), result.getActive()),
+                () -> assertEquals(source.getEndTime(), result.getEndTime()),
+                () -> assertEquals(source.getOpeningCount(), result.getOpeningCount()),
+                () -> assertEquals(source.getDescription(), result.getDescription())
+            );
+
 
         }
 
@@ -173,12 +178,14 @@ public class LinkInfoServiceImplTest {
 
         LinkInfoResponse response = linkInfoService.createLinkInfo(request);
 
-        assertNotNull(response);
-        assertEquals(request.getLink(), response.getLink());
-        assertEquals(request.getDescription(), response.getDescription());
-        assertEquals(request.getActive(), response.getActive());
-        assertEquals(request.getEndTime(), response.getEndTime());
-        assertNotNull(response.getId());
+        assertAll(
+            () -> assertNotNull(response),
+            () -> assertEquals(request.getLink(), response.getLink()),
+            () -> assertEquals(request.getDescription(), response.getDescription()),
+            () -> assertEquals(request.getActive(), response.getActive()),
+            () -> assertEquals(request.getEndTime(), response.getEndTime()),
+            () -> assertNotNull(response.getId())
+        );
 
 
         verify(linkInfoRepository, times(1)).save(any(LinkInfo.class));
@@ -202,15 +209,15 @@ public class LinkInfoServiceImplTest {
         LinkInfoResponse response2 = linkInfoService.createLinkInfo(request);
         LinkInfoResponse response3 = linkInfoService.createLinkInfo(request);
 
-        assertNotEquals(response1.getShortLink(), response2.getShortLink());
-        assertNotEquals(response2.getShortLink(), response3.getShortLink());
-        assertNotEquals(response1.getShortLink(), response3.getShortLink());
-
-        assertEquals(request.getLink(), response1.getLink());
-        assertEquals(request.getDescription(), response1.getDescription());
-        assertEquals(request.getActive(), response1.getActive());
-        assertEquals(request.getEndTime(), response1.getEndTime());
-
+        assertAll(
+            () -> assertNotEquals(response1.getShortLink(), response2.getShortLink()),
+            () -> assertNotEquals(response2.getShortLink(), response3.getShortLink()),
+            () -> assertNotEquals(response1.getShortLink(), response3.getShortLink()),
+            () -> assertEquals(request.getLink(), response1.getLink()),
+            () -> assertEquals(request.getDescription(), response1.getDescription()),
+            () -> assertEquals(request.getActive(), response1.getActive()),
+            () -> assertEquals(request.getEndTime(), response1.getEndTime())
+        );
     }
 
     @Test
@@ -237,16 +244,17 @@ public class LinkInfoServiceImplTest {
 
         LinkInfoResponse response = linkInfoService.createLinkInfo(request);
 
-        assertNotNull(response);
-        assertEquals(request.getLink(), response.getLink());
-        assertEquals(request.getDescription(), response.getDescription());
-        assertEquals(request.getActive(), response.getActive());
-        assertEquals(request.getEndTime(), response.getEndTime());
-        assertNotNull(response.getId());
-        assertEquals(8, response.getShortLink().length());
-        assertEquals(0L, response.getOpeningCount());
-        assertNotNull(response.getShortLink());
-
+        assertAll(
+            () -> assertNotNull(response),
+            () -> assertEquals(request.getLink(), response.getLink()),
+            () -> assertEquals(request.getDescription(), response.getDescription()),
+            () -> assertEquals(request.getActive(), response.getActive()),
+            () -> assertEquals(request.getEndTime(), response.getEndTime()),
+            () -> assertNotNull(response.getId()),
+            () -> assertEquals(8, response.getShortLink().length()),
+            () -> assertEquals(0L, response.getOpeningCount()),
+            () -> assertNotNull(response.getShortLink())
+        );
 
         verify(linkInfoRepository, times(1)).save(any(LinkInfo.class));
 
@@ -275,15 +283,17 @@ public class LinkInfoServiceImplTest {
 
         LinkInfoResponse response = linkInfoService.updateLinkInfo(request);
 
-        assertNotNull(response);
-        assert existingLink != null;
-        assertEquals(existingLink.getId(), response.getId());
-        assertEquals("Updated description", response.getDescription());
-        assertEquals(false, response.getActive());
-        assertEquals(existingLink.getLink(), response.getLink());
-        assertEquals(existingLink.getShortLink(), response.getShortLink());
-        assertEquals(existingLink.getEndTime(), response.getEndTime());
-        assertEquals(existingLink.getOpeningCount(), response.getOpeningCount());
+        assertNotNull(existingLink, "Существующая ссылка не должна быть null");
+        assertAll(
+            () -> assertNotNull(response),
+            () -> assertEquals(existingLink.getId(), response.getId()),
+            () -> assertEquals("Updated description", response.getDescription()),
+            () -> assertEquals(false, response.getActive()),
+            () -> assertEquals(existingLink.getLink(), response.getLink()),
+            () -> assertEquals(existingLink.getShortLink(), response.getShortLink()),
+            () -> assertEquals(existingLink.getEndTime(), response.getEndTime()),
+            () -> assertEquals(existingLink.getOpeningCount(), response.getOpeningCount())
+        );
 
         verify(linkInfoRepository).findByShortLink("abc123");
         verify(linkInfoRepository).save(any(LinkInfo.class));
@@ -329,14 +339,14 @@ public class LinkInfoServiceImplTest {
 
         LinkInfoResponse response = linkInfoService.updateLinkInfo(request);
 
-        assertNotNull(response);
-        assertEquals("Updated description", response.getDescription());
-        assert existingLink != null;
-        assertEquals(existingLink.getActive(), response.getActive());
-        assertEquals(existingLink.getLink(), response.getLink());
-        assertEquals(existingLink.getEndTime(), response.getEndTime());
-        assertEquals(existingLink.getOpeningCount(), response.getOpeningCount());
+        assertNotNull(existingLink, "Существующая ссылка не должна быть равна null");
+        assertAll(
+            () -> assertNotNull(response),
+            () -> assertEquals("Updated description", response.getDescription()),
+            () -> assertEquals(existingLink.getActive(), response.getActive()),
+            () -> assertEquals(existingLink.getLink(), response.getLink()),
+            () -> assertEquals(existingLink.getEndTime(), response.getEndTime()),
+            () -> assertEquals(existingLink.getOpeningCount(), response.getOpeningCount())
+        );
     }
-
-
 }

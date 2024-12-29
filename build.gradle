@@ -16,14 +16,6 @@ repositories {
     }
 }
 
-jacocoTestReport {
-    dependsOn test
-    reports {
-        xml.required = false
-        csv.required = false
-        html.required = true
-    }
-}
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -48,4 +40,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+tasks.withType(Test).configureEach {
+    systemProperty "file.encoding", "UTF-8"
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = false
+        csv.required = false
+        html.required = true
+    }
 }
