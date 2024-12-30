@@ -22,7 +22,11 @@ public class RedirectController {
 
     @GetMapping("/{shortLink}")
     public ResponseEntity<String> redirect(@PathVariable String shortLink) {
+        log.info("Поступил запрос на редирект короткой ссылки: {}", shortLink);
+
         LinkInfoResponse linkInfo = linkInfoService.getByShortLink(shortLink);
+
+        log.info("Выполняется редирект с короткой ссылки {} на {}", shortLink, linkInfo.getLink());
 
         return ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT)
             .header(HttpHeaders.LOCATION, linkInfo.getLink())
