@@ -49,7 +49,7 @@ public class LinkControllerValidationTest {
             .andExpect(status().isBadRequest())
             .andExpect(jsonPath("$.errorMessage").value("Ошибка валидации"))
             .andExpect(jsonPath("$.validationErrors[0].field").value("body.endTime"))
-            .andExpect(jsonPath("$.validationErrors[0].message").value("Дата должна быть в будущем"));
+            .andExpect(jsonPath("$.validationErrors[0].message").value("Дата окончания ссылки должна быть в будущем"));
     }
 
     @Test

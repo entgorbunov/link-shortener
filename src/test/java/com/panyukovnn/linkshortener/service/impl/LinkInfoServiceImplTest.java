@@ -1,5 +1,6 @@
 package com.panyukovnn.linkshortener.service.impl;
 
+import com.panyukovnn.linkshortener.controller.RedirectController;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
@@ -28,6 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -60,7 +62,9 @@ public class LinkInfoServiceImplTest {
             .endTime(LocalDateTime.now().plusDays(1))
             .openingCount(0L)
             .build();
-        when(linkInfoRepository.findByShortLink(linkInfo.getShortLink())).thenReturn(Optional.of(linkInfo));
+        when(linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(
+            eq(linkInfo.getShortLink()), any(LocalDateTime.class)))
+            .thenReturn(Optional.of(linkInfo));
 
 
         Optional<LinkInfoResponse> response = Optional.ofNullable(linkInfoService.getByShortLink(linkInfo.getShortLink()));

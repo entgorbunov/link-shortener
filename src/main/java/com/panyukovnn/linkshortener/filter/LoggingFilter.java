@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class LoggingFilter extends HttpFilter {
+
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
         String method = request.getMethod();

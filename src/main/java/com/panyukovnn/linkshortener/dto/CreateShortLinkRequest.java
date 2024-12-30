@@ -1,6 +1,6 @@
 package com.panyukovnn.linkshortener.dto;
 
-import com.panyukovnn.linkshortener.validation.ValidFutureDateTime;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -22,7 +22,7 @@ public class CreateShortLinkRequest {
     @NotEmpty(message = "Ссылка не может быть пустой")
     @Pattern(regexp = "^http[s]?://.+\\..+", message = "В ссылке допущена ошибка")
     private String link;
-    @ValidFutureDateTime
+    @Future(message = "Дата окончания ссылки должна быть в будущем")
     private LocalDateTime endTime;
     @NotEmpty(message = "Описание не должно быть пустым")
     private String description;

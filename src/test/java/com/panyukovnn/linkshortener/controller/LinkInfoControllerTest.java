@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -38,6 +39,9 @@ class LinkInfoControllerTest {
 
     @Autowired
     private LinkInfoController linkInfoController;
+
+    @Autowired
+    private RedirectController redirectController;
 
     @Test
     void shouldCreateShortLinkSuccessfully() {
@@ -92,7 +96,7 @@ class LinkInfoControllerTest {
         when(linkInfoService.getByShortLink(shortLink))
             .thenReturn(expectedResponse);
 
-        ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
+        ResponseEntity<String> response = redirectController.redirect(shortLink);
 
         assertAll(
             () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
@@ -168,7 +172,7 @@ class LinkInfoControllerTest {
         when(linkInfoService.getByShortLink(shortLink))
             .thenReturn(linkWithNoEndTime);
 
-        ResponseEntity<String> response = linkInfoController.getByShortLink(shortLink);
+        ResponseEntity<String> response = redirectController.redirect(shortLink);
 
         assertAll(
             () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),

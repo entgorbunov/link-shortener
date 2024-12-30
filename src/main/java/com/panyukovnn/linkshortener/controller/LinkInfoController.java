@@ -39,18 +39,6 @@ public class LinkInfoController {
             .build();
     }
 
-    @GetMapping(value = "/{shortLink}")
-    public ResponseEntity<String> getByShortLink(@PathVariable String shortLink) {
-        LinkInfoResponse linkInfo = linkInfoService.getByShortLink(shortLink);
-        if (!linkInfo.getActive()) {
-            throw new NotFoundException("Ссылка неактивна");
-        }
-        if (linkInfo.getEndTime() != null && LocalDateTime.now().isAfter(linkInfo.getEndTime())) {
-            throw new NotFoundException("Срок действия ссылки истек");
-        }
-        return ResponseEntity.ok(linkInfo.getLink());
-    }
-
     @GetMapping
     public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
         List<LinkInfoResponse> links = linkInfoService.findByFilter();

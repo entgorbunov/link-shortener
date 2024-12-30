@@ -47,7 +47,9 @@ public class LinkShortenerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public CommonResponse<?> handlerException(Exception e) {
+
         log.error("Непредвиденное исключение: {}", e.getMessage(), e);
+
         return CommonResponse.builder()
             .id(UUID.randomUUID())
             .errorMessage("Непредвиденное исключение:" + e.getMessage())
@@ -57,7 +59,9 @@ public class LinkShortenerExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
+
         log.warn("Ресурс не найден: {}", e.getMessage());
+
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .contentType(MediaType.TEXT_HTML)
