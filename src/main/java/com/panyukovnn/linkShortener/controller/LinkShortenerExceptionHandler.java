@@ -28,19 +28,23 @@ public class LinkShortenerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public CommonResponse<?> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
+
         List<ValidationError> validationErrors = bindingResult.getFieldErrors().stream()
             .map(fe -> ValidationError.builder()
                 .field(fe.getField())
                 .message(fe.getDefaultMessage())
                 .build())
             .toList();
+
         log.warn("Ошибка валидации: {}", validationErrors, e);
+
         return CommonResponse.builder()
             .errorMessage("Ошибка валидации")
             .validationErrors(validationErrors)
             .build();
     }
 
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public CommonResponse<?> handlerException(Exception e) {
         log.error("Непредвиденное исключение: {}", e.getMessage(), e);

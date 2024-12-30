@@ -32,9 +32,9 @@ public class LinkInfoController {
 
     @PostMapping("/create")
     public CommonResponse<LinkInfoResponse> createShortLink(@RequestBody @Valid CommonRequest<CreateShortLinkRequest> request) {
-        LinkInfoResponse linkInfo = linkInfoService.createLinkInfo(request.getData());
+        LinkInfoResponse linkInfo = linkInfoService.createLinkInfo(request.getBody());
         return CommonResponse.<LinkInfoResponse>builder()
-            .data(linkInfo)
+            .body(linkInfo)
             .id(UUID.randomUUID())
             .build();
     }
@@ -55,7 +55,7 @@ public class LinkInfoController {
     public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
         List<LinkInfoResponse> links = linkInfoService.findByFilter();
         return CommonResponse.<List<LinkInfoResponse>>builder()
-            .data(links)
+            .body(links)
             .id(UUID.randomUUID())
             .build();
     }

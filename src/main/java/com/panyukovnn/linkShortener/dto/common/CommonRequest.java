@@ -6,5 +6,5 @@ import lombok.Data;
 @Data
 public class CommonRequest<T> {
     @Valid
-    private T data;
+    private T body;
 }
