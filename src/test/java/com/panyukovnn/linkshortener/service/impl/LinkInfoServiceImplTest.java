@@ -87,7 +87,7 @@ public class LinkInfoServiceImplTest {
 
         assertThatThrownBy(() -> linkInfoService.getByShortLink(shortLink))
             .isInstanceOf(NotFoundException.class)
-            .hasMessageContaining("Ссылка не найдена");
+            .hasMessageContaining("Ссылка nonexistent не найдена");
     }
 
     @Test

@@ -1,4 +1,4 @@
-package com.panyukovnn.linkshortener.exceptionHandler;
+package com.panyukovnn.linkshortener.exceptionhandler;
 
 import com.panyukovnn.linkshortener.dto.ValidationError;
 import com.panyukovnn.linkshortener.dto.common.CommonResponse;
@@ -28,7 +28,6 @@ public class LinkShortenerExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public CommonResponse<?> handlerMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
-
         List<ValidationError> validationErrors = bindingResult.getFieldErrors().stream()
             .map(fe -> ValidationError.builder()
                 .field(fe.getField())
@@ -47,7 +46,6 @@ public class LinkShortenerExceptionHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(value = Exception.class)
     public CommonResponse<?> handlerException(Exception e) {
-
         log.error("Непредвиденное исключение: {}", e.getMessage(), e);
 
         return CommonResponse.builder()
@@ -59,7 +57,6 @@ public class LinkShortenerExceptionHandler {
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-
         log.warn("Ресурс не найден: {}", e.getMessage());
 
         return ResponseEntity

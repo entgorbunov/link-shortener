@@ -5,3 +5,6 @@ link-shortener:
 spring:
   profiles:
     active: log-exec-time
+server:
+  servlet:
+    context-path: /link-shortener

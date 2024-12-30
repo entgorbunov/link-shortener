@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
@@ -22,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -75,7 +75,7 @@ class LinkInfoControllerTest {
         assertAll(
             () -> assertThat(response).isNotNull(),
             () -> assertThat(response.getBody()).isEqualTo(expectedResponse)
-            );
+        );
 
         verify(linkInfoService, times(1)).createLinkInfo(createRequest);
     }
@@ -99,8 +99,9 @@ class LinkInfoControllerTest {
         ResponseEntity<String> response = redirectController.redirect(shortLink);
 
         assertAll(
-            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-            () -> assertThat(response.getBody()).isEqualTo(expectedResponse.getLink())
+            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TEMPORARY_REDIRECT),
+            () -> assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION))
+                .isEqualTo(expectedResponse.getLink())
         );
 
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
@@ -175,8 +176,8 @@ class LinkInfoControllerTest {
         ResponseEntity<String> response = redirectController.redirect(shortLink);
 
         assertAll(
-            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK),
-            () -> assertThat(response.getBody()).isEqualTo(linkWithNoEndTime.getLink())
+            () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.TEMPORARY_REDIRECT),
+            () -> assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(linkWithNoEndTime.getLink())
         );
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
     }

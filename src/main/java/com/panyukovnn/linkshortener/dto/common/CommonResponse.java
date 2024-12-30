@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommonResponse<T> {
+
     private UUID id;
     private T body;
     private String errorMessage;

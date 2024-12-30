@@ -24,7 +24,7 @@ import java.util.UUID;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/links")
+@RequestMapping("/api/v1/link-infos")
 @RequiredArgsConstructor
 public class LinkInfoController {
 
@@ -32,7 +32,12 @@ public class LinkInfoController {
 
     @PostMapping("/create")
     public CommonResponse<LinkInfoResponse> createShortLink(@RequestBody @Valid CommonRequest<CreateShortLinkRequest> request) {
+        log.info("Поступил запрос на создание короткой ссылки: {}", request);
+
         LinkInfoResponse linkInfo = linkInfoService.createLinkInfo(request.getBody());
+
+        log.info("Короткая ссылка создана успешно: {}", linkInfo);
+
         return CommonResponse.<LinkInfoResponse>builder()
             .body(linkInfo)
             .id(UUID.randomUUID())
@@ -41,7 +46,12 @@ public class LinkInfoController {
 
     @GetMapping
     public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
+        log.info("Поступил запрос на получение всех ссылок");
+
         List<LinkInfoResponse> links = linkInfoService.findByFilter();
+
+        log.info("Успешно получен список ссылок, количество: {}", links.size());
+
         return CommonResponse.<List<LinkInfoResponse>>builder()
             .body(links)
             .id(UUID.randomUUID())
@@ -50,7 +60,12 @@ public class LinkInfoController {
 
     @DeleteMapping("/{id}")
     public CommonResponse<Void> deleteLink(@PathVariable UUID id) {
+        log.info("Поступил запрос на удаление ссылки с id: {}", id);
+
         linkInfoService.deleteById(id);
+
+        log.info("Ссылка с id {} успешно удалена", id);
+
         return CommonResponse.<Void>builder()
             .id(UUID.randomUUID())
             .build();

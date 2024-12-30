@@ -43,7 +43,7 @@ public class LinkControllerValidationTest {
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
         request.setBody(createRequest);
 
-        mockMvc.perform(post("/api/v1/links/create")
+        mockMvc.perform(post("/api/v1/link-infos/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -64,7 +64,7 @@ public class LinkControllerValidationTest {
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
         request.setBody(createRequest);
 
-        mockMvc.perform(post("/api/v1/links/create")
+        mockMvc.perform(post("/api/v1/link-infos/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -85,7 +85,7 @@ public class LinkControllerValidationTest {
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
         request.setBody(createRequest);
 
-        mockMvc.perform(post("/api/v1/links/create")
+        mockMvc.perform(post("/api/v1/link-infos/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())
@@ -106,7 +106,7 @@ public class LinkControllerValidationTest {
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
         request.setBody(createRequest);
 
-        mockMvc.perform(post("/api/v1/links/create")
+        mockMvc.perform(post("/api/v1/link-infos/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isOk());
@@ -125,7 +125,7 @@ public class LinkControllerValidationTest {
         CommonRequest<CreateShortLinkRequest> request = new CommonRequest<>();
         request.setBody(createRequest);
 
-        mockMvc.perform(post("/api/v1/links/create")
+        mockMvc.perform(post("/api/v1/link-infos/create")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
             .andExpect(status().isBadRequest())

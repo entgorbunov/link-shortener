@@ -10,9 +10,9 @@ import com.panyukovnn.linkshortener.model.LinkInfo;
 import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -21,27 +21,19 @@ import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LinkInfoServiceImpl implements LinkInfoService {
 
-    private LinkInfoProperty linkInfoProperty;
-    private LinkInfoRepository linkInfoRepository;
-    private LinkMapper linkMapper;
+    private final LinkInfoProperty linkInfoProperty;
+    private final LinkInfoRepository linkInfoRepository;
+    private final LinkMapper linkMapper;
 
-    @Autowired
-    public LinkInfoServiceImpl(LinkInfoProperty linkInfoProperty, LinkInfoRepository linkInfoRepository, LinkMapper linkMapper) {
-        this.linkInfoProperty = linkInfoProperty;
-        this.linkInfoRepository = linkInfoRepository;
-        this.linkMapper = linkMapper;
-    }
-
-    public LinkInfoServiceImpl() {
-    }
 
     @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
         LinkInfo linkInfo = linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(shortLink, LocalDateTime.now())
-            .orElseThrow(() -> new NotFoundException("Ссылка не найдена"));
+            .orElseThrow(() -> new NotFoundException("Ссылка " + shortLink + " не найдена" ));
         return linkMapper.toResponse(linkInfo);
     }
 
