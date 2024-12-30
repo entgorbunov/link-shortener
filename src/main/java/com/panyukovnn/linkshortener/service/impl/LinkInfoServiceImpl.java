@@ -33,7 +33,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
         LinkInfo linkInfo = linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(shortLink, LocalDateTime.now())
-            .orElseThrow(() -> new NotFoundException("Ссылка " + shortLink + " не найдена" ));
+            .orElseThrow(() -> new NotFoundException("Ссылка " + shortLink + " не найдена"));
         return linkMapper.toResponse(linkInfo);
     }
 

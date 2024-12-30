@@ -1,6 +1,5 @@
 package com.panyukovnn.linkshortener.service.impl;
 
-import com.panyukovnn.linkshortener.controller.RedirectController;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;

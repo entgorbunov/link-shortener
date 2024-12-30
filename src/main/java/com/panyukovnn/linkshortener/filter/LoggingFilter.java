@@ -42,10 +42,6 @@ public class LoggingFilter extends HttpFilter {
         }
     }
 
-    private static String formatQueryString(HttpServletRequest request) {
-        return Optional.ofNullable(request.getQueryString()).map(qs -> "?" + qs).orElse(Strings.EMPTY);
-    }
-
     private String inlineHeaders(HttpServletRequest request) {
         Map<String, String> headersMap = Collections.list(request.getHeaderNames()).stream().collect(Collectors.toMap(Function.identity(), request::getHeader));
 
@@ -56,5 +52,9 @@ public class LoggingFilter extends HttpFilter {
             return headerName + "=" + headerValue;
         }).collect(Collectors.joining(","));
         return "headers={" + inlineHeaders + "}";
+    }
+
+    private static String formatQueryString(HttpServletRequest request) {
+        return Optional.ofNullable(request.getQueryString()).map(qs -> "?" + qs).orElse(Strings.EMPTY);
     }
 }
