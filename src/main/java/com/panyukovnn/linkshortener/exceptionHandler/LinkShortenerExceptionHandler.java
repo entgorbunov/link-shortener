@@ -1,4 +1,4 @@
-package com.panyukovnn.linkshortener.controller;
+package com.panyukovnn.linkshortener.exceptionHandler;
 
 import com.panyukovnn.linkshortener.dto.ValidationError;
 import com.panyukovnn.linkshortener.dto.common.CommonResponse;
