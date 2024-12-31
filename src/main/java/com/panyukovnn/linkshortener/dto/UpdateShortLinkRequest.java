@@ -1,5 +1,6 @@
 package com.panyukovnn.linkshortener.dto;
 
+import com.panyukovnn.linkshortener.validation.ValidUUID;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -17,9 +18,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateShortLinkRequest {
+public class UpdateShortLinkRequest {
 
-    @NotEmpty(message = "Ссылка не может быть пустой")
+    @ValidUUID
+    private String id;
     @Pattern(regexp = "^http[s]?://.+\\..+", message = "В ссылке допущена ошибка")
     private String link;
     @Future(message = "Дата окончания ссылки должна быть в будущем")
@@ -28,5 +30,4 @@ public class CreateShortLinkRequest {
     private String description;
     @NotNull(message = "Признак активности не может быть null")
     private Boolean active;
-
 }

@@ -2,43 +2,39 @@ package com.panyukovnn.linkshortener.service.impl;
 
 import com.panyukovnn.linkshortener.beanpostprocessor.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
+import com.panyukovnn.linkshortener.mapper.LinkMapper;
 import com.panyukovnn.linkshortener.model.LinkInfo;
-import com.panyukovnn.linkshortener.model.LinkInfoResponse;
 import com.panyukovnn.linkshortener.properties.LinkInfoProperty;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class LinkInfoServiceImpl implements LinkInfoService {
 
-    private LinkInfoProperty linkInfoProperty;
-    private LinkInfoRepository linkInfoRepository;
+    private final LinkInfoProperty linkInfoProperty;
+    private final LinkInfoRepository linkInfoRepository;
+    private final LinkMapper linkMapper;
 
-    @Autowired
-    public LinkInfoServiceImpl(LinkInfoProperty linkInfoProperty, LinkInfoRepository linkInfoRepository) {
-        this.linkInfoProperty = linkInfoProperty;
-        this.linkInfoRepository = linkInfoRepository;
-    }
-
-    public LinkInfoServiceImpl() {
-    }
 
     @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
-        LinkInfo linkInfo = linkInfoRepository.findByShortLink(shortLink)
-            .orElseThrow(() -> new NotFoundException("Ссылка не найдена"));
-        return convertToResponse(linkInfo);
+        LinkInfo linkInfo = linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(shortLink, LocalDateTime.now())
+            .orElseThrow(() -> new NotFoundException("Ссылка " + shortLink + " не найдена"));
+        return linkMapper.toResponse(linkInfo);
     }
 
     @LogExecutionTime
@@ -46,26 +42,18 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     public List<LinkInfoResponse> findByFilter() {
         return linkInfoRepository.findAll()
             .stream()
-            .map(LinkInfoServiceImpl::convertToResponse)
+            .map(linkMapper::toResponse)
             .toList();
     }
 
     @LogExecutionTime
     @Override
     public LinkInfoResponse createLinkInfo(CreateShortLinkRequest request) {
-        LinkInfo linkInfo = LinkInfo.builder()
-            .active(request.getActive())
-            .link(request.getLink())
-            .endTime(request.getEndTime())
-            .description(request.getDescription())
-            .id(UUID.randomUUID())
-            .shortLink(RandomStringUtils.randomAlphanumeric(linkInfoProperty.shortLinkLength()))
-            .openingCount(0L)
-            .build();
-
+        String shortLink = RandomStringUtils.randomAlphanumeric(linkInfoProperty.shortLinkLength());
+        LinkInfo linkInfo = linkMapper.fromCreateRequest(request, shortLink);
         LinkInfo savedLinkInfo = linkInfoRepository.save(linkInfo);
 
-        return convertToResponse(savedLinkInfo);
+        return linkMapper.toResponse(savedLinkInfo);
     }
 
     @LogExecutionTime
@@ -84,7 +72,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         }
         linkInfo.setEndTime(request.getEndTime());
         LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
-        return convertToResponse(updatedLinkInfo);
+        return linkMapper.toResponse(updatedLinkInfo);
     }
 
     @LogExecutionTime
@@ -93,15 +81,4 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         linkInfoRepository.deleteById(id);
     }
 
-    private static LinkInfoResponse convertToResponse(LinkInfo linkInfo) {
-        return LinkInfoResponse.builder()
-            .link(linkInfo.getLink())
-            .id(linkInfo.getId())
-            .active(linkInfo.getActive())
-            .description(linkInfo.getDescription())
-            .endTime(linkInfo.getEndTime())
-            .openingCount(linkInfo.getOpeningCount())
-            .shortLink(linkInfo.getShortLink())
-            .build();
-    }
 }

@@ -4,6 +4,7 @@ import com.panyukovnn.linkshortener.model.LinkInfo;
 import com.panyukovnn.linkshortener.repository.LinkInfoRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class LinkInfoRepositoryImpl implements LinkInfoRepository {
 
     private final Map<String, LinkInfo> linkStorage = new ConcurrentHashMap<>();
+
+    @Override
+    public Optional<LinkInfo> findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(String shortLink, LocalDateTime now) {
+        return Optional.ofNullable(linkStorage.get(shortLink))
+            .filter(LinkInfo::getActive)
+            .filter(link -> link.getEndTime() == null || now.isBefore(link.getEndTime()));
+    }
 
     @Override
     public Optional<LinkInfo> findByShortLink(String shortLink) {
