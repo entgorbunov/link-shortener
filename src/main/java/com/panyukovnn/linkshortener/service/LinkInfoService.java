@@ -1,6 +1,7 @@
 package com.panyukovnn.linkshortener.service;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 
@@ -11,7 +12,9 @@ public interface LinkInfoService {
 
     LinkInfoResponse getByShortLink(String shortLink);
 
-    List<LinkInfoResponse> findByFilter();
+    List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest);
+
+    List<LinkInfoResponse> findAll();
 
     LinkInfoResponse createLinkInfo(CreateShortLinkRequest request);
 

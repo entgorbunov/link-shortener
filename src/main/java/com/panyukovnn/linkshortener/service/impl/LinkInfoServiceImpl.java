@@ -2,6 +2,7 @@ package com.panyukovnn.linkshortener.service.impl;
 
 import com.panyukovnn.linkshortener.beanpostprocessor.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
@@ -32,14 +33,31 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
-        LinkInfo linkInfo = linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(shortLink, LocalDateTime.now())
+        LinkInfo linkInfo = linkInfoRepository.findActiveShortLink(shortLink, LocalDateTime.now())
             .orElseThrow(() -> new NotFoundException("Ссылка " + shortLink + " не найдена"));
+
+        linkInfoRepository.incrementOpeningCountByShortLink(shortLink);
+
         return linkMapper.toResponse(linkInfo);
     }
 
     @LogExecutionTime
     @Override
-    public List<LinkInfoResponse> findByFilter() {
+    public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
+        return linkInfoRepository.findByFilter(
+                filterLinkInfoRequest.getLinkPart(),
+                filterLinkInfoRequest.getEndTimeFrom(),
+                filterLinkInfoRequest.getEndTimeTo(),
+                filterLinkInfoRequest.getDescriptionPart(),
+                filterLinkInfoRequest.getActive()
+            )
+            .stream()
+            .map(linkMapper::toResponse)
+            .toList();
+    }
+
+    @Override
+    public List<LinkInfoResponse> findAll() {
         return linkInfoRepository.findAll()
             .stream()
             .map(linkMapper::toResponse)
@@ -59,19 +77,16 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     @LogExecutionTime
     @Override
     public LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request) {
-        LinkInfo linkInfo = linkInfoRepository.findByShortLink(request.getLink())
+        LinkInfo linkInfo = linkInfoRepository.findById(UUID.fromString(request.getId()))
             .orElseThrow(() -> new NotFoundException("Ссылка не найдена, id: " + request.getId()));
-        if (request.getDescription() != null) {
-            linkInfo.setDescription(request.getDescription());
-        }
-        if (request.getActive() != null) {
-            linkInfo.setActive(request.getActive());
-        }
-        if (request.getLink() != null) {
-            linkInfo.setLink(request.getLink());
-        }
+
+        linkInfo.setDescription(request.getDescription());
+        linkInfo.setActive(request.getActive());
+        linkInfo.setLink(request.getLink());
         linkInfo.setEndTime(request.getEndTime());
+
         LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
+
         return linkMapper.toResponse(updatedLinkInfo);
     }
 

@@ -1,7 +1,6 @@
 package com.panyukovnn.linkshortener.dto.common;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.panyukovnn.linkshortener.dto.ValidationError;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

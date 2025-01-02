@@ -1,13 +1,16 @@
 package com.panyukovnn.linkshortener.exceptionhandler;
 
-import com.panyukovnn.linkshortener.dto.ValidationError;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.panyukovnn.linkshortener.dto.common.CommonResponse;
-import com.panyukovnn.linkshortener.exceptions.NotFoundException;
+import com.panyukovnn.linkshortener.dto.common.ValidationError;
+import com.panyukovnn.linkshortener.exceptions.NotFoundShortLinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -55,14 +58,39 @@ public class LinkShortenerExceptionHandler {
     }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException e) {
-        log.warn("Ресурс не найден: {}", e.getMessage());
+    @ExceptionHandler(NotFoundShortLinkException.class)
+    public ResponseEntity<String> handleNotFoundPageException(NotFoundShortLinkException e) {
+        log.warn(e.getMessage(), e);
 
         return ResponseEntity
             .status(HttpStatus.NOT_FOUND)
             .contentType(MediaType.TEXT_HTML)
             .body(notFoundPage);
+    }
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public CommonResponse<?> handleInvalidFormatException(HttpMessageNotReadableException e) {
+        if (e.getCause() instanceof InvalidFormatException ife) {
+
+            List<ValidationError> errors = ife.getPath().stream()
+                .map(JsonMappingException.Reference::getFieldName)
+                .filter(fieldName -> !"body".equals(fieldName))
+                .map(fieldName -> ValidationError.builder()
+                    .field(fieldName)
+                    .message("Некорректный формат данных")
+                    .build())
+                .toList();
+
+            log.error("Ошибки формата данных: {}", errors, e);
+
+            return CommonResponse.builder()
+                .errorMessage("Ошибки валидации формата данных")
+                .validationErrors(errors)
+                .build();
+        }
+
+        return handlerException(e);
     }
 
 
