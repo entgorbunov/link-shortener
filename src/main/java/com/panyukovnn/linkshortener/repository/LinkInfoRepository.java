@@ -15,9 +15,9 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
 
     @Query("""
         FROM LinkInfo
-                WHERE shortLink = :shortLink
-                        AND active = true
-                                AND (endTime is null or endTime > :now)
+        WHERE shortLink = :shortLink
+        AND active = true
+        AND (endTime is null or endTime > :now)
         """)
     Optional<LinkInfo> findActiveShortLink(String shortLink, LocalDateTime now);
 

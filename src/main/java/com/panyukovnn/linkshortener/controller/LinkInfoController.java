@@ -55,7 +55,7 @@ public class LinkInfoController {
             .build();
     }
 
-    @PutMapping()
+    @PatchMapping
     public CommonResponse<LinkInfoResponse> updateShortLink(
         @RequestBody @Valid CommonRequest<UpdateShortLinkRequest> request
     ) {
@@ -67,20 +67,6 @@ public class LinkInfoController {
 
         return CommonResponse.<LinkInfoResponse>builder()
             .body(updatedLinkInfo)
-            .id(UUID.randomUUID())
-            .build();
-    }
-
-    @GetMapping
-    public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
-        log.info("Поступил запрос на получение всех ссылок");
-
-        List<LinkInfoResponse> links = linkInfoService.findAll();
-
-        log.info("Успешно получен список ссылок, количество: {}", links.size());
-
-        return CommonResponse.<List<LinkInfoResponse>>builder()
-            .body(links)
             .id(UUID.randomUUID())
             .build();
     }

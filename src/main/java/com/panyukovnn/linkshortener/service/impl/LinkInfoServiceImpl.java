@@ -80,10 +80,18 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         LinkInfo linkInfo = linkInfoRepository.findById(UUID.fromString(request.getId()))
             .orElseThrow(() -> new NotFoundException("Ссылка не найдена, id: " + request.getId()));
 
-        linkInfo.setDescription(request.getDescription());
-        linkInfo.setActive(request.getActive());
-        linkInfo.setLink(request.getLink());
-        linkInfo.setEndTime(request.getEndTime());
+        if (request.getDescription() != null) {
+            linkInfo.setDescription(request.getDescription());
+        }
+        if (request.getActive() != null) {
+            linkInfo.setActive(request.getActive());
+        }
+        if (request.getLink() != null) {
+            linkInfo.setLink(request.getLink());
+        }
+        if (request.getEndTime() != null) {
+            linkInfo.setEndTime(request.getEndTime());
+        }
 
         LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
 
