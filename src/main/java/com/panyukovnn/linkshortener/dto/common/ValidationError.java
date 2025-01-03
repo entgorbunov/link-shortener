@@ -1,4 +1,4 @@
-package com.panyukovnn.linkshortener.dto;
+package com.panyukovnn.linkshortener.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

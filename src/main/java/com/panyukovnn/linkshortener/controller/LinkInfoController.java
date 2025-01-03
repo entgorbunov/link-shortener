@@ -1,7 +1,9 @@
 package com.panyukovnn.linkshortener.controller;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.common.CommonRequest;
 import com.panyukovnn.linkshortener.dto.common.CommonResponse;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
@@ -10,8 +12,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -41,16 +45,28 @@ public class LinkInfoController {
             .build();
     }
 
-    @GetMapping
-    public CommonResponse<List<LinkInfoResponse>> getAllLinks() {
-        log.info("Поступил запрос на получение всех ссылок");
-
-        List<LinkInfoResponse> links = linkInfoService.findByFilter();
-
-        log.info("Успешно получен список ссылок, количество: {}", links.size());
+    @PostMapping("/filter")
+    public CommonResponse<List<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
+        List<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
 
         return CommonResponse.<List<LinkInfoResponse>>builder()
-            .body(links)
+            .id(UUID.randomUUID())
+            .body(linkInfoResponses)
+            .build();
+    }
+
+    @PatchMapping
+    public CommonResponse<LinkInfoResponse> updateShortLink(
+        @RequestBody @Valid CommonRequest<UpdateShortLinkRequest> request
+    ) {
+        log.info("Поступил запрос на обновление короткой ссылки: {}", request);
+
+        LinkInfoResponse updatedLinkInfo = linkInfoService.updateLinkInfo(request.getBody());
+
+        log.info("Короткая ссылка обновлена успешно: {}", updatedLinkInfo);
+
+        return CommonResponse.<LinkInfoResponse>builder()
+            .body(updatedLinkInfo)
             .id(UUID.randomUUID())
             .build();
     }
