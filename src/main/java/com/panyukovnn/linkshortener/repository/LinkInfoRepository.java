@@ -23,8 +23,8 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
 
     @Query("""
         UPDATE LinkInfo
-                set openingCount = openingCount + 1
-                where shortLink = :shortLink
+        SET openingCount = openingCount + 1
+        WHERE shortLink = :shortLink
         """)
     @Modifying
     @Transactional
@@ -34,10 +34,10 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
         SELECT *
         FROM link_info
         WHERE (:linkPart is null or lower(link) like lower(concat('%', :linkPart, '%')))
-                AND (cast(:endTimeFrom as date) is null or end_time >= :endTimeFrom)
-                AND (cast(:endTimeTo as date) is null or end_time <= :endTimeTo)
-                AND (:descriptionPart is null or lower(description) like lower(concat('%', :descriptionPart, '%')))
-                AND (:active is NULL or active = :active)
+        AND (cast(:endTimeFrom as date) is null or end_time >= :endTimeFrom)
+        AND (cast(:endTimeTo as date) is null or end_time <= :endTimeTo)
+        AND (:descriptionPart is null or lower(description) like lower(concat('%', :descriptionPart, '%')))
+        AND (:active is NULL or active = :active)
         """, nativeQuery = true)
     List<LinkInfo> findByFilter(
         String linkPart,

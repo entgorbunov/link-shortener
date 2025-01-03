@@ -89,9 +89,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         if (request.getLink() != null) {
             linkInfo.setLink(request.getLink());
         }
-        if (request.getEndTime() != null) {
             linkInfo.setEndTime(request.getEndTime());
-        }
 
         LinkInfo updatedLinkInfo = linkInfoRepository.save(linkInfo);
 
