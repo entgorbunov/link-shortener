@@ -20,7 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-public class LinkInfo extends AuditableEntity{
+public class LinkInfo extends AuditableEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
