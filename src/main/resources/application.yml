@@ -30,3 +30,6 @@ logging:
   web-logging:
     enabled: true
     log-body: true
+    masked-headers:
+      - authorization
+      - cookie
