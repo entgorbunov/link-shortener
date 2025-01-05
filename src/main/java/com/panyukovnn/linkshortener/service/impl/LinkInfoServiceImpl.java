@@ -22,6 +22,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -111,7 +112,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     }
 
     private Sort buildSort(@Valid List<SortRequest> sorts) {
-        if (sorts == null || sorts.isEmpty()) {
+        if (CollectionUtils.isEmpty(sorts)) {
             return Sort.unsorted();
         }
 

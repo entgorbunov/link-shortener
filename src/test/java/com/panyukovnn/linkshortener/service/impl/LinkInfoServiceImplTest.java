@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -132,11 +133,11 @@ public class LinkInfoServiceImplTest {
         FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
 
         when(linkInfoRepository.findByFilter(
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
             any(Pageable.class)
         )).thenReturn(sourcePage);
 
@@ -163,11 +164,11 @@ public class LinkInfoServiceImplTest {
         }
 
         verify(linkInfoRepository, times(1)).findByFilter(
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
             any(Pageable.class)
         );
     }
@@ -179,11 +180,11 @@ public class LinkInfoServiceImplTest {
         PageImpl<LinkInfo> emptyPage = new PageImpl<>(new ArrayList<>());
 
         when(linkInfoRepository.findByFilter(
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
-            eq(null),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
             any(Pageable.class)
         )).thenReturn(emptyPage);
 
