@@ -22,6 +22,15 @@ spring:
     hibernate:
       ddl-auto: validate
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
 link-shortener:
   short-link-length: 8
 
@@ -33,3 +42,6 @@ logging:
     masked-headers:
       - authorization
       - cookie
+    excluded-paths:
+      - /link-shortener/actuator.*
+      - /link-shortener/health
