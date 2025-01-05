@@ -1,5 +1,6 @@
 package com.panyukovnn.linkshortener.controller;
 
+import com.panyukovn.annotation.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
@@ -10,17 +11,15 @@ import com.panyukovnn.linkshortener.service.LinkInfoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -31,6 +30,7 @@ public class LinkInfoController {
 
     private final LinkInfoService linkInfoService;
 
+    @LogExecutionTime
     @PostMapping("/create")
     public CommonResponse<LinkInfoResponse> createShortLink(@RequestBody @Valid CommonRequest<CreateShortLinkRequest> request) {
         log.info("Поступил запрос на создание короткой ссылки: {}", request);
@@ -45,16 +45,18 @@ public class LinkInfoController {
             .build();
     }
 
+    @LogExecutionTime
     @PostMapping("/filter")
-    public CommonResponse<List<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
-        List<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
+    public CommonResponse<Page<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
+        Page<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
 
-        return CommonResponse.<List<LinkInfoResponse>>builder()
+        return CommonResponse.<Page<LinkInfoResponse>>builder()
             .id(UUID.randomUUID())
             .body(linkInfoResponses)
             .build();
     }
 
+    @LogExecutionTime
     @PatchMapping
     public CommonResponse<LinkInfoResponse> updateShortLink(
         @RequestBody @Valid CommonRequest<UpdateShortLinkRequest> request
@@ -71,6 +73,7 @@ public class LinkInfoController {
             .build();
     }
 
+    @LogExecutionTime
     @DeleteMapping("/{id}")
     public CommonResponse<Void> deleteLink(@PathVariable UUID id) {
         log.info("Поступил запрос на удаление ссылки с id: {}", id);

@@ -1,6 +1,7 @@
 package com.panyukovnn.linkshortener.service.impl;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 
 import java.time.LocalDateTime;
@@ -29,6 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -61,7 +67,7 @@ public class LinkInfoServiceImplTest {
             .endTime(LocalDateTime.now().plusDays(1))
             .openingCount(0L)
             .build();
-        when(linkInfoRepository.findByShortLinkAndActiveIsTrueAndEndTimeAfterOrEndTimeIsNull(
+        when(linkInfoRepository.findActiveShortLink(
             eq(linkInfo.getShortLink()), any(LocalDateTime.class)))
             .thenReturn(Optional.of(linkInfo));
 
@@ -82,7 +88,7 @@ public class LinkInfoServiceImplTest {
     @Test
     void shouldThrowNotFoundExceptionWhenShortLinkDoesNotExist() {
         String shortLink = "nonexistent";
-        when(linkInfoRepository.findByShortLink(shortLink)).thenReturn(Optional.empty());
+        when(linkInfoRepository.findActiveShortLink(eq(shortLink), any(LocalDateTime.class))).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> linkInfoService.getByShortLink(shortLink))
             .isInstanceOf(NotFoundException.class)
@@ -122,14 +128,29 @@ public class LinkInfoServiceImplTest {
             .build();
 
         List<LinkInfo> sourceList = List.of(linkInfo, linkInfo1, linkInfo2);
+        PageImpl<LinkInfo> sourcePage = new PageImpl<>(sourceList);
 
-        when(linkInfoRepository.findAll()).thenReturn(sourceList);
+        FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
 
-        List<LinkInfoResponse> resultList = linkInfoService.findByFilter();
+        when(linkInfoRepository.findByFilter(
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            any(Pageable.class)
+        )).thenReturn(sourcePage);
 
-        for (int i = 0; i < sourceList.size(); i++) {
-            LinkInfo source = sourceList.get(i);
-            LinkInfoResponse result = resultList.get(i);
+        Page<LinkInfoResponse> resultList = linkInfoService.findByFilter(filterLinkInfoRequest);
+
+        assertAll(
+            () -> assertNotNull(resultList),
+            () -> assertEquals(sourcePage.getSize(), resultList.getSize())
+        );
+
+        for (int i = 0; i < sourcePage.getSize(); i++) {
+            LinkInfo source = sourcePage.getContent().get(i);
+            LinkInfoResponse result = resultList.getContent().get(i);
 
             assertAll(
                 () -> assertEquals(source.getId(), result.getId()),
@@ -140,20 +161,37 @@ public class LinkInfoServiceImplTest {
                 () -> assertEquals(source.getOpeningCount(), result.getOpeningCount()),
                 () -> assertEquals(source.getDescription(), result.getDescription())
             );
-
-
         }
 
-        verify(linkInfoRepository, times(1)).findAll();
-
+        verify(linkInfoRepository, times(1)).findByFilter(
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            any(Pageable.class)
+        );
     }
 
     @Test
     void shouldReturnEmptyListWhenNoLinksExist() {
-        when(linkInfoRepository.findAll()).thenReturn(new ArrayList<>());
-        List<LinkInfoResponse> emptyResult = linkInfoService.findByFilter();
+        FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
 
-        assertThat(emptyResult).isNotNull().hasSize(0);
+        PageImpl<LinkInfo> emptyPage = new PageImpl<>(new ArrayList<>());
+
+        when(linkInfoRepository.findByFilter(
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            isNull(),
+            any(Pageable.class)
+        )).thenReturn(emptyPage);
+
+        Page<LinkInfoResponse> emptyResult = linkInfoService.findByFilter(filterLinkInfoRequest);
+
+        assertThat(emptyResult).isNotNull();
+        assertThat(emptyResult.getContent()).isEmpty();
 
     }
 
@@ -265,8 +303,10 @@ public class LinkInfoServiceImplTest {
 
     @Test
     void shouldSuccessfulUpdateLinkInfo() {
+        UUID id = UUID.randomUUID();
+
         LinkInfo existingLink = LinkInfo.builder()
-            .id(UUID.randomUUID())
+            .id(id)
             .link("http://example.com")
             .shortLink("abc123")
             .active(true)
@@ -275,10 +315,11 @@ public class LinkInfoServiceImplTest {
             .openingCount(5L)
             .build();
 
-        when(linkInfoRepository.findByShortLink("abc123")).thenReturn(Optional.ofNullable(existingLink));
+        doReturn(Optional.ofNullable(existingLink)).when(linkInfoRepository).findById(id);
         when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(i -> i.getArgument(0));
 
         UpdateShortLinkRequest request = UpdateShortLinkRequest.builder()
+            .id(id.toString())
             .link("abc123")
             .description("Updated description")
             .active(false)
@@ -298,15 +339,18 @@ public class LinkInfoServiceImplTest {
             () -> assertEquals(existingLink.getOpeningCount(), response.getOpeningCount())
         );
 
-        verify(linkInfoRepository).findByShortLink("abc123");
+        verify(linkInfoRepository).findById(id);
         verify(linkInfoRepository).save(any(LinkInfo.class));
     }
 
     @Test
     void shouldThrowNotFoundExceptionWhenUpdatingNonExistingLink() {
-        when(linkInfoRepository.findByShortLink("nonexistent")).thenReturn(Optional.empty());
+        when(linkInfoRepository.findActiveShortLink("nonexistent", LocalDateTime.now().plusDays(1))).thenReturn(Optional.empty());
+
+        UUID id = UUID.randomUUID();
 
         UpdateShortLinkRequest request = UpdateShortLinkRequest.builder()
+            .id(id.toString())
             .link("nonexistent")
             .description("New description")
             .active(true)
@@ -316,14 +360,16 @@ public class LinkInfoServiceImplTest {
             .isInstanceOf(NotFoundException.class)
             .hasMessageContaining("Ссылка не найдена");
 
-        verify(linkInfoRepository).findByShortLink("nonexistent");
+        verify(linkInfoRepository).findById(id);
         verify(linkInfoRepository, never()).save(any(LinkInfo.class));
     }
 
     @Test
     void shouldOnlyUpdateProvidedFields() {
+        UUID id = UUID.randomUUID();
+
         LinkInfo existingLink = LinkInfo.builder()
-            .id(UUID.randomUUID())
+            .id(id)
             .link("http://example.com")
             .shortLink("abc123")
             .active(true)
@@ -332,10 +378,11 @@ public class LinkInfoServiceImplTest {
             .openingCount(5L)
             .build();
 
-        when(linkInfoRepository.findByShortLink("abc123")).thenReturn(Optional.ofNullable(existingLink));
+        when(linkInfoRepository.findById(id)).thenReturn(Optional.of(existingLink));
         when(linkInfoRepository.save(any(LinkInfo.class))).thenAnswer(i -> i.getArgument(0));
 
         UpdateShortLinkRequest request = UpdateShortLinkRequest.builder()
+            .id(id.toString())
             .link("abc123")
             .description("Updated description")
             .build();
@@ -351,5 +398,8 @@ public class LinkInfoServiceImplTest {
             () -> assertEquals(existingLink.getEndTime(), response.getEndTime()),
             () -> assertEquals(existingLink.getOpeningCount(), response.getOpeningCount())
         );
+
+        verify(linkInfoRepository).findById(id);
+        verify(linkInfoRepository).save(any(LinkInfo.class));
     }
 }

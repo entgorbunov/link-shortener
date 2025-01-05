@@ -1,7 +1,9 @@
 package com.panyukovnn.linkshortener.controller;
 
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
+import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.common.CommonRequest;
 import com.panyukovnn.linkshortener.dto.common.CommonResponse;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
@@ -9,6 +11,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -113,35 +118,43 @@ class LinkInfoControllerTest {
             LinkInfoResponse.builder()
                 .id(UUID.randomUUID())
                 .link("http://example1.com")
-                .shortLink("abc123")
-                .active(true)
-                .description("First link")
                 .endTime(LocalDateTime.now().plusDays(1))
+                .description("First link")
+                .active(true)
+                .shortLink("abc123")
                 .openingCount(5L)
                 .build(),
             LinkInfoResponse.builder()
                 .id(UUID.randomUUID())
                 .link("http://example2.com")
-                .shortLink("def456")
-                .active(true)
-                .description("Second link")
                 .endTime(LocalDateTime.now().plusDays(2))
+                .description("Second link")
+                .active(true)
+                .shortLink("def456")
                 .openingCount(3L)
                 .build()
         );
 
-        when(linkInfoService.findByFilter())
-            .thenReturn(expectedLinks);
+        PageImpl<LinkInfoResponse> expectedPage = new PageImpl<>(expectedLinks);
 
-        CommonResponse<List<LinkInfoResponse>> response = linkInfoController.getAllLinks();
+        FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
+
+        when(linkInfoService.findByFilter(filterLinkInfoRequest))
+            .thenReturn(expectedPage);
+
+        CommonRequest<FilterLinkInfoRequest> request = new CommonRequest<>();
+        request.setBody(filterLinkInfoRequest);
+
+        CommonResponse<Page<LinkInfoResponse>> response = linkInfoController.getLinkInfos(request);
 
         assertNotNull(response, "Ответ не должен быть null");
         assertAll(
             () -> assertThat(response).isNotNull(),
-            () -> assertThat(response.getBody()).isEqualTo(expectedLinks),
-            () -> assertThat(response.getBody()).hasSize(2)
+            () -> assertThat(response.getBody()).isNotNull(),
+            () -> assertThat(response.getBody().getContent()).isEqualTo(expectedLinks),
+            () -> assertThat(response.getBody().getContent()).hasSize(2)
         );
-        verify(linkInfoService, times(1)).findByFilter();
+        verify(linkInfoService, times(1)).findByFilter(filterLinkInfoRequest);
     }
 
     @Test
@@ -180,6 +193,47 @@ class LinkInfoControllerTest {
             () -> assertThat(response.getHeaders().getFirst(HttpHeaders.LOCATION)).isEqualTo(linkWithNoEndTime.getLink())
         );
         verify(linkInfoService, times(1)).getByShortLink(shortLink);
+    }
+
+    @Test
+    void shouldUpdateShortLinkSuccessfully() {
+
+        UpdateShortLinkRequest updateRequest = UpdateShortLinkRequest.builder()
+            .id(UUID.randomUUID().toString())
+            .link("http://updated.com")
+            .active(true)
+            .description("Updated test link")
+            .endTime(LocalDateTime.now().plusDays(2))
+            .build();
+
+        CommonRequest<UpdateShortLinkRequest> request = new CommonRequest<>();
+        request.setBody(updateRequest);
+
+        LinkInfoResponse expectedResponse = LinkInfoResponse.builder()
+            .id(UUID.fromString(updateRequest.getId()))
+            .link(updateRequest.getLink())
+            .shortLink("updatedShort")
+            .active(updateRequest.getActive())
+            .description(updateRequest.getDescription())
+            .endTime(updateRequest.getEndTime())
+            .openingCount(5L)
+            .build();
+
+        doReturn(expectedResponse).when(linkInfoService).updateLinkInfo(any(UpdateShortLinkRequest.class));
+
+        CommonResponse<LinkInfoResponse> response = linkInfoController.updateShortLink(request);
+
+        assertAll(
+            () -> assertThat(response).isNotNull(),
+            () -> assertThat(response.getBody()).isNotNull(),
+            () -> assertThat(response.getBody()).isEqualTo(expectedResponse),
+            () -> assertThat(response.getBody().getLink()).isEqualTo(updateRequest.getLink()),
+            () -> assertThat(response.getBody().getDescription()).isEqualTo(updateRequest.getDescription()),
+            () -> assertThat(response.getBody().getActive()).isEqualTo(updateRequest.getActive()),
+            () -> assertThat(response.getBody().getEndTime()).isEqualTo(updateRequest.getEndTime())
+        );
+
+        verify(linkInfoService, times(1)).updateLinkInfo(updateRequest);
     }
 
 }

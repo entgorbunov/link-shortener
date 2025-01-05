@@ -16,9 +16,9 @@ import static com.panyukovnn.linkshortener.util.Constants.DB_DEFAULT_USER;
 public class AuditableEntity {
 
     private LocalDateTime createTime;
-    private String  createUser;
+    private String createUser;
     private LocalDateTime lastUpdateTime;
-    private String  lastUpdateUser;
+    private String lastUpdateUser;
 
     @PrePersist
     public void prePersist() {
