@@ -135,24 +135,22 @@ class LinkInfoControllerTest {
                 .build()
         );
 
-        PageImpl<LinkInfoResponse> expectedPage = new PageImpl<>(expectedLinks);
-
         FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
 
         when(linkInfoService.findByFilter(filterLinkInfoRequest))
-            .thenReturn(expectedPage);
+            .thenReturn(expectedLinks);
 
         CommonRequest<FilterLinkInfoRequest> request = new CommonRequest<>();
         request.setBody(filterLinkInfoRequest);
 
-        CommonResponse<Page<LinkInfoResponse>> response = linkInfoController.getLinkInfos(request);
+        CommonResponse<List<LinkInfoResponse>> response = linkInfoController.getLinkInfos(request);
 
         assertNotNull(response, "Ответ не должен быть null");
         assertAll(
             () -> assertThat(response).isNotNull(),
             () -> assertThat(response.getBody()).isNotNull(),
-            () -> assertThat(response.getBody().getContent()).isEqualTo(expectedLinks),
-            () -> assertThat(response.getBody().getContent()).hasSize(2)
+            () -> assertThat(response.getBody()).isEqualTo(expectedLinks),
+            () -> assertThat(response.getBody()).hasSize(2)
         );
         verify(linkInfoService, times(1)).findByFilter(filterLinkInfoRequest);
     }

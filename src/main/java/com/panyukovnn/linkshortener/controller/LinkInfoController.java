@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.UUID;
 
 @Slf4j
@@ -47,10 +48,10 @@ public class LinkInfoController {
 
     @LogExecutionTime
     @PostMapping("/filter")
-    public CommonResponse<Page<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
-        Page<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
+    public CommonResponse<List<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
+        List<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
 
-        return CommonResponse.<Page<LinkInfoResponse>>builder()
+        return CommonResponse.<List<LinkInfoResponse>>builder()
             .id(UUID.randomUUID())
             .body(linkInfoResponses)
             .build();

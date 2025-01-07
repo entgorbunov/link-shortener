@@ -3,6 +3,7 @@ package com.panyukovnn.linkshortener.service.impl;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
+import com.panyukovnn.linkshortener.dto.PageableRequest;
 import com.panyukovnn.linkshortener.dto.UpdateShortLinkRequest;
 import com.panyukovnn.linkshortener.exceptions.NotFoundException;
 import com.panyukovnn.linkshortener.model.LinkInfo;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
@@ -130,7 +130,14 @@ public class LinkInfoServiceImplTest {
         List<LinkInfo> sourceList = List.of(linkInfo, linkInfo1, linkInfo2);
         PageImpl<LinkInfo> sourcePage = new PageImpl<>(sourceList);
 
-        FilterLinkInfoRequest filterLinkInfoRequest = new FilterLinkInfoRequest();
+        FilterLinkInfoRequest filterLinkInfoRequest = FilterLinkInfoRequest.builder()
+            .linkPart(null)
+            .endTimeFrom(null)
+            .endTimeTo(null)
+            .descriptionPart(null)
+            .active(null)
+            .page(PageableRequest.builder().number(1).size(10).build())
+            .build();
 
         when(linkInfoRepository.findByFilter(
             isNull(),
@@ -141,16 +148,16 @@ public class LinkInfoServiceImplTest {
             any(Pageable.class)
         )).thenReturn(sourcePage);
 
-        Page<LinkInfoResponse> resultList = linkInfoService.findByFilter(filterLinkInfoRequest);
+        List<LinkInfoResponse> resultList = linkInfoService.findByFilter(filterLinkInfoRequest);
 
         assertAll(
             () -> assertNotNull(resultList),
-            () -> assertEquals(sourcePage.getSize(), resultList.getSize())
+            () -> assertEquals(sourceList.size(), resultList.size())
         );
 
         for (int i = 0; i < sourcePage.getSize(); i++) {
             LinkInfo source = sourcePage.getContent().get(i);
-            LinkInfoResponse result = resultList.getContent().get(i);
+            LinkInfoResponse result = resultList.get(i);
 
             assertAll(
                 () -> assertEquals(source.getId(), result.getId()),
@@ -188,10 +195,10 @@ public class LinkInfoServiceImplTest {
             any(Pageable.class)
         )).thenReturn(emptyPage);
 
-        Page<LinkInfoResponse> emptyResult = linkInfoService.findByFilter(filterLinkInfoRequest);
+        List<LinkInfoResponse> emptyResult = linkInfoService.findByFilter(filterLinkInfoRequest);
 
         assertThat(emptyResult).isNotNull();
-        assertThat(emptyResult.getContent()).isEmpty();
+        assertThat(emptyResult).isEmpty();
 
     }
 

@@ -51,7 +51,7 @@ public class LinkInfoServiceImpl implements LinkInfoService {
 
     @LogExecutionTime
     @Override
-    public Page<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
+    public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
         PageableRequest page = filterLinkInfoRequest.getPage();
 
         Sort sort = buildSort(page.getSorts());
@@ -70,7 +70,8 @@ public class LinkInfoServiceImpl implements LinkInfoService {
                 filterLinkInfoRequest.getActive(),
                 pageable
             )
-            .map(linkMapper::toResponse);
+            .map(linkMapper::toResponse)
+            .toList();
     }
 
     @LogExecutionTime
