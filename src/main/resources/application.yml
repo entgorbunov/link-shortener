@@ -9,7 +9,7 @@ spring:
   application:
     name: link-shortener
   datasource:
-    url: jdbc:postgresql://localhost:5433/mentoring
+    url: jdbc:postgresql://localhost:5434/mentoring
     username: postgres
     password: s9td3ixh
     hikari:
