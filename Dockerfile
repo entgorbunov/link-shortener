@@ -1,10 +1,10 @@
 FROM amazoncorretto:17.0.7-alpine
 
-COPY ./build/libs/link-shortener-1.0-SNAPSHOT.jar ./link-shortener.jar
+COPY ./link-shortener-*.jar ./link-shortener.jar
 
 #ENV SPRING_PROFILES_ACTIVE=docker
 ENV TZ=Europe/Moscow
 
-EXPOSE 8080
+EXPOSE 8081
 
 CMD ["java", "-jar", "./link-shortener.jar"]

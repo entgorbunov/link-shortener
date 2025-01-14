@@ -1,5 +1,5 @@
 spring:
   datasource:
-    url: jdbc:postgresql://host.docker.internal:5434/mentoring
+    url: jdbc:postgresql://postgres-link-shortener:5432/mentoring
     username: postgres
     password: s9td3ixh
