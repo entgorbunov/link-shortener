@@ -4,8 +4,6 @@ server:
     context-path: /${spring.application.name}
 
 spring:
-  profiles:
-    active: log-exec-time
   application:
     name: link-shortener
   datasource:
@@ -16,7 +14,6 @@ spring:
       schema: link_shortener
       connection-init-sql: CREATE SCHEMA IF NOT EXISTS ${spring.datasource.hikari.schema};
   liquibase:
-    enabled: true
     change-log: classpath:/db/changelog/changelog-master.yml
   jpa:
     hibernate:
