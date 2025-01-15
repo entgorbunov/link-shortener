@@ -1,6 +1,5 @@
 package com.panyukovnn.linkshortener.service.impl;
 
-import com.panyukovn.annotation.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
@@ -37,7 +36,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
     private final LinkMapper linkMapper;
 
 
-    @LogExecutionTime
     @Override
     public LinkInfoResponse getByShortLink(String shortLink) {
         LinkInfo linkInfo = linkInfoRepository.findActiveShortLink(shortLink, LocalDateTime.now())
@@ -48,7 +46,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         return linkMapper.toResponse(linkInfo);
     }
 
-    @LogExecutionTime
     @Override
     public List<LinkInfoResponse> findByFilter(FilterLinkInfoRequest filterLinkInfoRequest) {
         PageableRequest page = filterLinkInfoRequest.getPage();
@@ -73,7 +70,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
             .toList();
     }
 
-    @LogExecutionTime
     @Override
     public LinkInfoResponse createLinkInfo(CreateShortLinkRequest request) {
         String shortLink = RandomStringUtils.randomAlphanumeric(linkInfoProperty.shortLinkLength());
@@ -83,7 +79,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         return linkMapper.toResponse(savedLinkInfo);
     }
 
-    @LogExecutionTime
     @Override
     public LinkInfoResponse updateLinkInfo(UpdateShortLinkRequest request) {
         LinkInfo linkInfo = linkInfoRepository.findById(UUID.fromString(request.getId()))
@@ -105,7 +100,6 @@ public class LinkInfoServiceImpl implements LinkInfoService {
         return linkMapper.toResponse(updatedLinkInfo);
     }
 
-    @LogExecutionTime
     @Override
     public void deleteById(UUID id) {
         linkInfoRepository.deleteById(id);

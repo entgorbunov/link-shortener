@@ -1,6 +1,5 @@
 package com.panyukovnn.linkshortener.controller;
 
-import com.panyukovn.annotation.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.CreateShortLinkRequest;
 import com.panyukovnn.linkshortener.dto.FilterLinkInfoRequest;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
@@ -30,7 +29,6 @@ public class LinkInfoController {
 
     private final LinkInfoService linkInfoService;
 
-    @LogExecutionTime
     @PostMapping("/create")
     public CommonResponse<LinkInfoResponse> createShortLink(@RequestBody @Valid CommonRequest<CreateShortLinkRequest> request) {
         log.info("Поступил запрос на создание короткой ссылки: {}", request);
@@ -45,7 +43,6 @@ public class LinkInfoController {
             .build();
     }
 
-    @LogExecutionTime
     @PostMapping("/filter")
     public CommonResponse<List<LinkInfoResponse>> getLinkInfos(@RequestBody @Valid CommonRequest<FilterLinkInfoRequest> request) {
         List<LinkInfoResponse> linkInfoResponses = linkInfoService.findByFilter(request.getBody());
@@ -56,7 +53,6 @@ public class LinkInfoController {
             .build();
     }
 
-    @LogExecutionTime
     @PatchMapping
     public CommonResponse<LinkInfoResponse> updateShortLink(
         @RequestBody @Valid CommonRequest<UpdateShortLinkRequest> request
@@ -73,7 +69,6 @@ public class LinkInfoController {
             .build();
     }
 
-    @LogExecutionTime
     @DeleteMapping("/{id}")
     public CommonResponse<Void> deleteLink(@PathVariable UUID id) {
         log.info("Поступил запрос на удаление ссылки с id: {}", id);
