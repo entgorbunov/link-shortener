@@ -1,6 +1,5 @@
 package com.panyukovnn.linkshortener.controller;
 
-import com.panyukovn.annotation.LogExecutionTime;
 import com.panyukovnn.linkshortener.dto.LinkInfoResponse;
 import com.panyukovnn.linkshortener.service.LinkInfoService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ public class RedirectController {
 
     private final LinkInfoService linkInfoService;
 
-    @LogExecutionTime
     @GetMapping("/{shortLink}")
     public ResponseEntity<String> redirect(@PathVariable String shortLink) {
         log.info("Поступил запрос на редирект короткой ссылки: {}", shortLink);

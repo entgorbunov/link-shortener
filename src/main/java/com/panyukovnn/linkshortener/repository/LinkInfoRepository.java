@@ -1,6 +1,5 @@
 package com.panyukovnn.linkshortener.repository;
 
-import com.panyukovn.annotation.LogExecutionTime;
 import com.panyukovnn.linkshortener.model.LinkInfo;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -15,7 +14,6 @@ import java.util.UUID;
 
 public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
 
-    @LogExecutionTime
     @Query("""
         FROM LinkInfo
         WHERE shortLink = :shortLink
@@ -24,7 +22,6 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
         """)
     Optional<LinkInfo> findActiveShortLink(String shortLink, LocalDateTime now);
 
-    @LogExecutionTime
     @Query("""
         UPDATE LinkInfo
         SET openingCount = openingCount + 1
@@ -34,7 +31,6 @@ public interface LinkInfoRepository extends JpaRepository<LinkInfo, UUID> {
     @Transactional
     void incrementOpeningCountByShortLink(String shortLink);
 
-    @LogExecutionTime
     @Query("""
          FROM LinkInfo
          WHERE (:linkPart IS NULL OR lower(link) LIKE '%' || lower(cast(:linkPart AS String)) || '%')

@@ -13,11 +13,10 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
-    mavenLocal()
     mavenCentral()
-    maven {
-        url("https://raw.githubusercontent.com/entgorbunov/logging-starter-gradle/master/maven-repo")
-    }
+//    maven {
+//        url("https://raw.githubusercontent.com/entgorbunov/logging-starter-gradle/master/maven-repo/com/panyukovn/logging-starter-gradle")
+//    }
 }
 
 def loggingStarterVersion = '1.2-SNAPSHOT'
@@ -32,7 +31,7 @@ dependencies {
     runtimeOnly 'org.liquibase:liquibase-core'
     runtimeOnly 'org.postgresql:postgresql'
 
-    implementation "com.panyukovn:logging-starter-gradle:${loggingStarterVersion}"
+//    implementation "com.panyukovn:logging-starter-gradle:${loggingStarterVersion}"
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
